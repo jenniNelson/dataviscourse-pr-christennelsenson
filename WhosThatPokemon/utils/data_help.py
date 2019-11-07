@@ -22,9 +22,10 @@ class Pokemon:
 
 def find_evo_chain(index):
     global evo_involved
-    src = bs(urlopen("https://www.serebii.net/pokedex-sm/{}.shtml".format(pokedex[index].long_id)),
+    src = bs(urlopen("https://www.serebii.net/pokedex-sm/{}.shtml".format(pokedex[index].long_id), timeout=5),
              features="html.parser")
     table = src.find_all('table', attrs={'class': 'evochain'})[0]
+
     table_string = str(table)
     matches = re.findall(r'pokemon/\d{3}\.png', table_string)
     evo_involved = list(map(lambda s: s[-7:-4], matches))  # matches.map( lambda s : s[-7:-4] )
@@ -47,10 +48,19 @@ if __name__ == '__main__':
 
     print("\n--------    Scraping Evolution Data...    --------\n")
     ev_info = list()
-    for i in range(20,30):  #range(len(pokedex)):
+    for i in range(len(pokedex)):
         chain = find_evo_chain(i)
+
         long_index = pokedex[i].long_id
-        chain_pos = chain.index(long_index)
+
+        # hack for incorrect data
+
+        if chain.count(long_index) > 0:
+            chain_pos = chain.index(long_index)
+        else:
+            chain.append(long_index)
+            chain_pos = len(chain) - 1
+            print("!!!!!! Couldn't find image? !!!!!!")
         ev_from = ""
         ev_to = ""
         is_base = 0
@@ -68,10 +78,11 @@ if __name__ == '__main__':
         ev_info.append([pokedex[i].name, long_index, ev_from, ev_to, is_base, is_full_ev, str(chain)])
 
     print("\n--------    Writing Evolution File...    --------\n")
-    with open("../data/evolutions.csv", 'w', newline='', encoding='utf-8') as evo_file:
-        writer = csv.writer(evo_file)
-        writer.writerow(["name", "long_index", "ev_from", "ev_to", "is_base", "is_full_ev", "evo_family"])
-        writer.writerows(ev_info)
+    # Data is already gathered. This is no longer necessary. Do not overwrite the file!
+    # with open("../data/evolutions.csv", 'w', newline='', encoding='utf-8') as evo_file:
+    #     writer = csv.writer(evo_file)
+    #     writer.writerow(["name", "long_index", "ev_from", "ev_to", "is_base", "is_full_ev", "evo_family"])
+    #     writer.writerows(ev_info)
 
 
 
