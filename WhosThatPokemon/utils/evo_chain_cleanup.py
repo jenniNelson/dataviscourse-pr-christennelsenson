@@ -33,15 +33,16 @@ if __name__ == '__main__':
         if len(ev_to_set) > 1:
             print(mon.name, ev_to_set)
 
-    print('\nwriting new file\n')
-
-    with open(r"../data/pokemon_data/evolutions2.csv", 'w', encoding='utf-8', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['name','long_id','ev_from','ev_to','is_base','is_full_ev','evo_family'])
-        for mon in evos:
-            writer.writerow([mon.name, mon.long_id, mon.ev_from,
-                             id_to_ev_set[mon.long_id], mon.ev_base,
-                             mon.ev_full, mon.ev_fam])
+    # ----Evolution2 file already written and cleaned. Don't touch it anymore!
+    # print('\nwriting new file\n')
+    #
+    # with open(r"../data/pokemon_data/evolutions2.csv", 'w', encoding='utf-8', newline='') as file:
+    #     writer = csv.writer(file)
+    #     writer.writerow(['name','long_id','ev_from','ev_to','is_base','is_full_ev','evo_family'])
+    #     for mon in evos:
+    #         writer.writerow([mon.name, mon.long_id, mon.ev_from,
+    #                          id_to_ev_set[mon.long_id], mon.ev_base,
+    #                          mon.ev_full, mon.ev_fam])
 
 
 
