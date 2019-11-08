@@ -1,13 +1,57 @@
 
 
 class Pokedex {
-    constructor(pokemon, callback_object_or_whatever){
 
-        this.pokemon = pokemon
+    constructor(pokemon, callback_object_or_whatever) {
+
+
+        this.pokemon = pokemon;
+
+        this.p_v_p = [];
+        this.team = [];
 
         this.createTable()
 
     }
+
+    //
+    // update_checkboxes(classname, list_to_check){
+    //     d3.selectAll("input."+classname).each(function() {
+    //         if(d3.select(this).datum in list_to_check) {
+    //             d3.select(this).property("checked", true)
+    //         }else{
+    //             d3.select(this).property("checked", null)
+    //         }
+    //     });
+    //
+    // }
+    //
+    // p_v_p_change(d,i){
+    //     console.log("PVP Checked/unchecked: ", d,i, this, self)
+    //
+    //
+    //
+    // }
+    //
+    // teambuilder_change(d,i, that){
+    //     console.log("Team Checked/uncheckes: ", d,i,this, that);
+    //     if(this.checked){
+    //         if (that.team.length < 6) {
+    //             that.team.push(d);
+    //         }
+    //         else {
+    //             that.team.shift();
+    //             that.team.push(d);
+    //         }
+    //     }
+    //     else{
+    //         that.team.splice(that.team.indexOf(d),1)
+    //     }
+    //     console.log(that.team);
+    //     that.update_checkboxes("teambuilder_checkbox", that.team)
+    // }
+
+
 
     createTable() {
 
@@ -16,6 +60,22 @@ class Pokedex {
             .append("tr")
         let table_body = table.append("tbody")
         let rows = table_body.selectAll("tr").data(this.pokemon).join("tr");
+
+        /** Change the order here to change the order in-table **/
+        let self = this;
+        header_row.append("th").text("PvP");
+        rows.append("td").append("input")
+            .attr("type", "checkbox")
+            .classed("pvp_checkbox", true)
+            // .on('click', this.p_v_p_change);
+
+        header_row.append("th").text("Team");
+        rows.append("td").append("input")
+            .attr("type", "checkbox")
+            .classed("teambuilder_checkbox", true)
+            // .on('click', function(d,i) {
+            //     self.teambuilder_change(d, i, self)
+            // });
 
         header_row.append("th").text("Dex #");
         rows.append("td").text(p=> p.pokedex_number);
@@ -61,6 +121,9 @@ class Pokedex {
 
         header_row.append("th").text("Height (m)");
         rows.append("td").text(p=> p.height_m);
+
+        rows.on("mouseover", (d,i) => console.log(d));
+        rows.on("mouseout", () => console.log("MOUSEOUT"));
 
 
         // Takes care of that nasty sorting business
