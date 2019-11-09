@@ -4,6 +4,13 @@ class MapView {
 
 
         this.initialize_maps_and_tabs()
+
+        this.update_pokemon({
+            0: "001",
+            1: "321",
+            3: "801",
+            5: "031"
+        })
     }
 
     initialize_maps_and_tabs(){
@@ -59,7 +66,7 @@ class MapView {
             .on("click", this.open_map)
             .text(d => d.text);
 
-        d3.select("#map_area").selectAll("div.tabcontent")
+        d3.select("#map_area>#the_maps").selectAll("div.tabcontent")
             .data(gen_list)
             .join("div")
             .classed("tabcontent", true)
@@ -100,10 +107,31 @@ class MapView {
         d3.select("#"+which.tab_id).classed("active", true)
     }
 
-    update_pokemon(poke_list){
-    //    Assuming poke_list is of their pokedex numbers
+    update_pokemon(poke_dict){
 
-        
+        for (let i of [0,1,2,3,4,5]){
+            let the_poke = d3.select('#map_poke_' + i);
+            the_poke.html("");
+            let row = the_poke.append("table").append("tr")
+            let img_td = row.append("td");
+            let locs_td = row.append("td");
+            if( i in poke_dict) {
+                img_td.append("img")
+                    .attr("src", "data/pokemon_data/sprites/" + poke_dict[i] + ".png")
+                    .attr("width", 100)
+                    .attr("height", 100)
+                    .style("object-fit", "contain")
+                    // .attr("overflow", "hidden")
+                locs_td.append("div")
+                    .text("Name: XXX (###)\nWhere: XXX,XXX,XXX")
+            } else{
+                img_td.append("img")
+                    .attr("src", "data/pokemon_data/sprites/whodat.png")
+                    .attr("width", 100)
+                locs_td.append("div")
+                    .text("Pokemon not selected.")
+            }
+        }
 
 
     }
