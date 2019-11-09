@@ -105,10 +105,16 @@ class Pokedex {
         rows.append("td").text(p=> p.speed);
 
         header_row.append("th").text("Type 1");
-        rows.append("td").text(p=> p.type1);
+        rows.append("td")
+            .attr("align", "center")
+            .attr("class", p=> "type_"+p.type1)
+            .text(p=> p.type1);
 
         header_row.append("th").text("Type 2");
-        rows.append("td").text(p=> p.type2);
+        rows.append("td")
+            .attr("align", "center")
+            .attr("class", p=> "type_"+p.type2)
+            .text(p=> p.type2);
 
         header_row.append("th").text("Capture Rate");
         rows.append("td").text(p=> p.capture_rate);
@@ -119,8 +125,8 @@ class Pokedex {
         header_row.append("th").text("Orig. Gen");
         rows.append("td").text(p=> p.generation);
 
-        header_row.append("th").text("Height (m)");
-        rows.append("td").text(p=> p.height_m);
+        // header_row.append("th").text("Height (m)");
+        // rows.append("td").text(p=> p.height_m);
 
         rows.on("mouseover", (d,i) => console.log(d));
         rows.on("mouseout", () => console.log("MOUSEOUT"));
@@ -131,4 +137,7 @@ class Pokedex {
 
 
     }
+
+
+
 }
