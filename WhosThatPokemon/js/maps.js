@@ -8,8 +8,8 @@ class MapView {
         this.update_pokemon({
             0: "001",
             1: "321",
-            3: "801",
-            5: "031"
+            3: "022",
+            5: "026"
         })
     }
 
@@ -73,7 +73,7 @@ class MapView {
             .classed("tabcontent", true)
             .classed("map_img", true)
             .attr("id", d => d.map_id)
-            .text(d=>d.text)
+            // .text(d=>d.text)
             .append("img")
             .attr("src", d=>d.image)
             .attr("width", 500)
