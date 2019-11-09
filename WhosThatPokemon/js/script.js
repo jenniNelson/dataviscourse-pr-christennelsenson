@@ -4,6 +4,7 @@ loadData().then(pokemon => {
 
     let callbacks = new Callbacks();
     let pokedex = new Pokedex(pokemon, callbacks);
+    let mapview = new MapView();
 
     console.log(pokemon);
     console.log(pokedex);
