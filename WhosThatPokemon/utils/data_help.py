@@ -5,6 +5,7 @@ from urllib.request import (
 import re
 from bs4 import BeautifulSoup as bs
 
+
 class Pokemon:
     def __init__(self, input_data: list):
         self.name = input_data[30]
