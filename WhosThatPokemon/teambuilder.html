@@ -13,6 +13,7 @@
     <script src="https://d3js.org/d3.v5.js"></script>
     <script src="js/tools/sorttable.js" type="text/javascript"></script>
     <script src="js/pokedex.js"></script>
+    <script src="js/maps.js"></script>
     <script src="js/script.js"></script>
 </head>
 <body>
@@ -81,8 +82,28 @@
 
             </td>
             <td style="vertical-align: top; width: 800px">
-                <div class="map_area">
-                    hey2 a
+                <div id="map_area">
+                    <div class="tab">
+
+                    </div>
+                    <div id="the_maps">
+
+                    </div>
+                    <!--The map views go here-->
+                    <div style="horiz-align: center">
+                        <table id="map_pokemon_viewer">
+                            <tr>
+                                <td id="map_poke_0"></td>
+                                <td id="map_poke_1"></td>
+                                <td id="map_poke_2"></td>
+                            </tr>
+                            <tr>
+                                <td id="map_poke_3"></td>
+                                <td id="map_poke_4"></td>
+                                <td id="map_poke_5"></td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
 
                 <div style="height:300px;overflow:auto;">
