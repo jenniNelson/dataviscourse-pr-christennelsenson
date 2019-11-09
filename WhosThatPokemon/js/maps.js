@@ -17,44 +17,44 @@ class MapView {
         let gen_list = [
             {
                 tab_id: "Gen1_button",
-                map_id: "Gen1_button",
+                map_id: "Gen1_map",
                 text: "Gen 1",
                 image: "data/map_data/Kanto.png",
-                map: "data/map_data/pokearth.html"
+                map: "#kanto_map"
             },
             {
                 tab_id: "Gen2_button",
-                map_id: "Gen2_button",
+                map_id: "Gen2_map",
                 text: "Gen 2",
                 image: "data/map_data/Johto.png"
             },
             {
                 tab_id: "Gen3_button",
-                map_id: "Gen3_button",
+                map_id: "Gen3_map",
                 text: "Gen 3",
                 image: "data/map_data/Hoenn.png"
             },
             {
                 tab_id: "Gen4_button",
-                map_id: "Gen4_button",
+                map_id: "Gen4_map",
                 text: "Gen 4",
                 image: "data/map_data/Sinnoh.png"
             },
             {
                 tab_id: "Gen5_button",
-                map_id: "Gen5_button",
+                map_id: "Gen5_map",
                 text: "Gen 5",
                 image: "data/map_data/Unova_2.png"
             },
             {
                 tab_id: "Gen6_button",
-                map_id: "Gen6_button",
+                map_id: "Gen6_map",
                 text: "Gen 6",
                 image: "data/map_data/Kalos.png"
             },
             {
                 tab_id: "Gen7_button",
-                map_id: "Gen7_button",
+                map_id: "Gen7_map",
                 text: "Gen 7",
                 image: "data/map_data/Alola.png"
             }
@@ -63,6 +63,7 @@ class MapView {
             .data(gen_list)
             .join("button")
             .classed("tablinks", true)
+            .attr("id", d=>d.tab_id)
             .on("click", this.open_map)
             .text(d => d.text);
 
@@ -76,7 +77,7 @@ class MapView {
             .append("img")
             .attr("src", d=>d.image)
             .attr("width", 500)
-            .attr("map", d=> d.map)
+            .attr("usemap", d=> d.map)
 
 
 
@@ -123,7 +124,7 @@ class MapView {
                     .style("object-fit", "contain")
                     // .attr("overflow", "hidden")
                 locs_td.append("div")
-                    .text("Name: XXX (###)\nWhere: XXX,XXX,XXX")
+                    .text("Name: XXX (###)\nWhere: Not found in the wild")
             } else{
                 img_td.append("img")
                     .attr("src", "data/pokemon_data/sprites/whodat.png")
