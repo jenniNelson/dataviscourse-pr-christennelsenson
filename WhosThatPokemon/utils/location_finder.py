@@ -85,13 +85,16 @@ if __name__ == '__main__':
                 poke_locations[p.long_id].update(full_locations)
         print(p.name, p.long_id, list(poke_locations[p.long_id]))
 
-    print("\nWriting file\n")
-    with open(r"../data/pokemon_data/locations.csv", 'w', encoding='utf-8', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['name','id','locations'])
-        for i in range(scrape_size):
-            p = mons[i]
-            writer.writerow([p.name, p.long_id, str(list(poke_locations[p.long_id]))])
+
+    # ---- We don't need to write to a file anymore. Commenting this out for safety. ----
+
+    # print("\nWriting file\n")
+    # with open(r"../data/pokemon_data/locations.csv", 'w', encoding='utf-8', newline='') as file:
+    #     writer = csv.writer(file)
+    #     writer.writerow(['name','id','locations'])
+    #     for i in range(scrape_size):
+    #         p = mons[i]
+    #         writer.writerow([p.name, p.long_id, str(list(poke_locations[p.long_id]))])
 
     print(games)
 
