@@ -108,7 +108,9 @@ tr:hover {background-color: #f5f5f5;}
 }
 
 #vs_table {
-    width: 100%
+    width: 100%;
+    horiz-align: center;
+    vertical-align: center;
 }
 
 #left_pokemon_pane {
@@ -117,6 +119,17 @@ tr:hover {background-color: #f5f5f5;}
 
 #right_pokemon_pane {
 
+}
+
+#left_dropdown {
+    /*position: relative;*/
+    /*left: 5%;*/
+    /*right: 5%;*/
+    width: 100%
+}
+
+#right_dropdown {
+    width: 100%
 }
 
 /*#switch_container {*/
