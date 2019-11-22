@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<svg width="100%" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet"
+viewBox="0 0 144 120">
+<!--<svg width="144" height="120" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">-->
+ <!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ -->
+ <!--<g>-->
+  <!--<title>background</title>-->
+  <!--<rect fill="#fff" id="canvas_background" height="122" width="146" y="-1" x="-1"/>-->
+ <!--</g>-->
+ <g>
+  <title>Layer 1</title>
+  <image y="0" href="data/map_data/Johto.png" id="svg_1" height="120" width="144" x="0"/>
+  <rect id="svg_2" height="8.28877" width="24.331551" y="40.080213" x="47.802138"/>
+  <rect id="svg_3" height="8.28877" width="31.550804" y="79.919785" x="95.93048" />
+  <rect id="svg_4" height="8.28877" width="23.529413" y="24.037432" x="32.026737" />
+  <rect id="svg_5" height="8.28877" width="8.02139" y="24.037433" x="64.112298" />
+  <rect id="svg_6" height="8.28877" width="15.240642" y="24.037432" x="80.155081" />
+  <rect id="svg_7" height="31.016042" width="8" y="40.080218" x="15.716577" />
+  <rect id="svg_9" height="22.727271" width="8" y="48.636368" x="40.048127" />
+  <rect id="svg_10" height="31.016042" width="8" y="48.636369" x="88.176469" />
+  <rect id="svg_11" height="31.016042" width="8" y="80.454551" x="39.780747" />
+  <rect id="svg_12" height="55.347594" width="8" y="48.368989" x="71.866311" />
+  <rect id="svg_13" height="15.508019" width="8" y="24.304817" x="24.005347" />
+  <rect id="svg_14" height="23.79679" width="8" y="56.122999" x="111.973267" />
+  <rect id="svg_15" height="31.283423" width="8" y="32.326207" x="119.994653" />
+  <rect id="svg_16" height="7.754008" width="8" y="16.016047" x="95.930482" />
+  <rect id="svg_17" height="8" width="8" y="103.716585" x="64.112298" />
+  <rect id="svg_20" height="8" width="15.486631" y="40.080221" x="80.155077" />
+  <rect id="svg_21" height="8" width="15.486631" y="23.770059" x="104.219248" />
+  <rect id="svg_22" height="8" width="8" y="31.791452" x="55.823527" />
+  <rect id="svg_23" height="8" width="8" y="79.919792" x="15.983956" />
+  <ellipse ry="5" rx="5" id="svg_24" cy="28.048127" cx="75.743316" />
+  <ellipse ry="5" rx="5" id="svg_25" cy="12.005346" cx="99.807488" />
+  <ellipse ry="5" rx="5" id="svg_26" cy="20.026736" cx="124.139037" />
+  <ellipse ry="5" rx="5" id="svg_27" cy="52.1123" cx="139.914443" />
+  <ellipse ry="5" rx="5" id="svg_28" cy="59.866309" cx="67.721925" />
+  <ellipse ry="5" rx="5" id="svg_29" cy="44.358289" cx="43.925134" />
+  <ellipse ry="5" rx="5" id="svg_30" cy="107.727273" cx="76.010695" />
+  <ellipse ry="5" rx="5" id="svg_31" cy="75.641713" cx="19.593581" />
+  <rect id="svg_32" height="9" width="9" y="103.449205" x="55.556148" />
+  <rect id="svg_33" height="9" width="9" y="79.652412" x="87.37433" />
+  <rect id="svg_34" height="9" width="9" y="79.385034" x="7.160426" />
+  <rect id="svg_35" height="9" width="9" y="71.363642" x="39.513366" />
+  <rect id="svg_36" height="9" width="9" y="79.385034" x="127.48128" />
+  <rect id="svg_37" height="9" width="9" y="23.77006" x="119.192512" />
+  <rect id="svg_38" height="9" width="9" y="23.50268" x="95.395721" />
+  <rect id="svg_39" height="9" width="9" y="40.080221" x="23.470584" />
+  <rect id="svg_40" height="9" width="9" y="39.278078" x="71.331549" />
+  <rect id="svg_41" height="9" width="9" y="23.2353" x="55.288768" />
+ </g>
+</svg>
