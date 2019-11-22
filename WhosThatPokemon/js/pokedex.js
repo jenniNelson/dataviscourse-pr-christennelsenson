@@ -7,14 +7,26 @@ class Pokedex {
 
         this.pokemon = pokemon;
 
-        this.p_v_p = [];
-        this.team = [];
+        this.p_v_p = {
+            0: null,
+            1: null,
+            queue: []
+        };
+        this.team = {
+            0: null,
+            1: null,
+            2: null,
+            3: null,
+            4: null,
+            5: null,
+            queue: []
+        };
 
         this.createTable()
 
     }
 
-    //
+
     // update_checkboxes(classname, list_to_check){
     //     d3.selectAll("input."+classname).each(function() {
     //         if(d3.select(this).datum in list_to_check) {
@@ -25,31 +37,163 @@ class Pokedex {
     //     });
     //
     // }
-    //
-    // p_v_p_change(d,i){
-    //     console.log("PVP Checked/unchecked: ", d,i, this, self)
-    //
-    //
-    //
-    // }
-    //
-    // teambuilder_change(d,i, that){
-    //     console.log("Team Checked/uncheckes: ", d,i,this, that);
-    //     if(this.checked){
-    //         if (that.team.length < 6) {
-    //             that.team.push(d);
-    //         }
-    //         else {
-    //             that.team.shift();
-    //             that.team.push(d);
-    //         }
-    //     }
-    //     else{
-    //         that.team.splice(that.team.indexOf(d),1)
-    //     }
-    //     console.log(that.team);
-    //     that.update_checkboxes("teambuilder_checkbox", that.team)
-    // }
+
+    update_pvp_checks(){
+        d3.selectAll("input.pvp_checkbox").each(function() {
+            d3.select(this).property("checked", false)
+        });
+        if (this.p_v_p[0] != null){
+            d3.select("#pvp_"+this.p_v_p[0]).property("checked", true)
+        }
+        if (this.p_v_p[1] != null){
+            d3.select("#pvp_"+this.p_v_p[1]).property("checked", true)
+        }
+    }
+
+    p_v_p_change(d,i){
+
+
+        let chkbx = d3.select("#pvp_"+d.pokedex_number)
+
+        console.log("PVP Checked/unchecked: ", d,i, this, chkbx)
+
+        let is_checked = chkbx.property('checked')
+
+        console.log(is_checked)
+
+        if(is_checked){
+
+            if (this.p_v_p[0] == null){
+                this.p_v_p[0] = d.pokedex_number;
+                this.p_v_p.queue.push(0);
+            } else if (this.p_v_p[1] == null){
+                this.p_v_p[1] = d.pokedex_number;
+                this.p_v_p.queue.push(1);
+            } else{
+                let one_to_displace = this.p_v_p.queue.shift();
+                one_to_displace = one_to_displace === undefined ? 0 : one_to_displace;
+                this.p_v_p[one_to_displace] = d.pokedex_number;
+                this.p_v_p.queue.push(one_to_displace);
+            }
+
+
+        } else {
+            if(this.p_v_p[0] === d.pokedex_number){
+                this.p_v_p[0] = null;
+                // Remove from queue
+                let index = this.p_v_p.queue.indexOf(0);
+                if (index > -1) {
+                  this.p_v_p.queue.splice(index, 1);
+                }
+            } else if(this.p_v_p[1] === d.pokedex_number){
+                this.p_v_p[1] = null;
+                // Remove from queue
+                let index = this.p_v_p.queue.indexOf(1);
+                if (index > -1) {
+                  this.p_v_p.queue.splice(index, 1);
+                }
+            } else{
+                console.log("A pokemon was unselected but never selected. This is kindof a problem?")
+            }
+
+        }
+
+        console.log(this.p_v_p)
+        this.update_pvp_checks()
+
+
+    }
+
+    update_team_checks(){
+        d3.selectAll("input.teambuilder_checkbox").each(function() {
+            d3.select(this).property("checked", false)
+        });
+
+        for (let i of [0,1,2,3,4,5]){
+            if (this.team[i] != null){
+                d3.select("#team_"+this.team[i]).property("checked", true)
+            }
+        }
+    }
+
+    teambuilder_change(d,i){
+
+        let chkbx = d3.select("#team_"+d.pokedex_number)
+
+        console.log("Team Checked/unchecked: ", d,i, this, chkbx)
+
+        let is_checked = chkbx.property('checked')
+
+        console.log(is_checked)
+
+        if(is_checked){
+
+            // if (this.p_v_p[0] == null){
+            //     this.p_v_p[0] = d.pokedex_number;
+            //     this.p_v_p.queue.push(0);
+            // } else if (this.p_v_p[1] == null){
+            //     this.p_v_p[1] = d.pokedex_number;
+            //     this.p_v_p.queue.push(1);
+            // } else{
+            //     let one_to_displace = this.p_v_p.queue.shift();
+            //     one_to_displace = one_to_displace === undefined ? 0 : one_to_displace;
+            //     this.p_v_p[one_to_displace] = d.pokedex_number;
+            //     this.p_v_p.queue.push(one_to_displace);
+            // }
+
+            let none_free = true;
+            for (let i of [0,1,2,3,4,5]){
+                if (this.team[i] == null) {
+                    this.team[i] = d.pokedex_number;
+                    this.team.queue.push(i);
+                    none_free = false;
+                    break;
+                }
+            }
+            if (none_free){
+                let one_to_displace = this.team.queue.shift();
+                one_to_displace = one_to_displace === undefined ? 0 : one_to_displace;
+                this.team[one_to_displace] = d.pokedex_number;
+                this.team.queue.push(one_to_displace);
+            }
+
+
+        } else {
+            // if(this.p_v_p[0] === d.pokedex_number){
+            //     this.p_v_p[0] = null;
+            //     // Remove from queue
+            //     let index = this.p_v_p.queue.indexOf(0);
+            //     if (index > -1) {
+            //       this.p_v_p.queue.splice(index, 1);
+            //     }
+            // } else if(this.p_v_p[1] === d.pokedex_number){
+            //     this.p_v_p[1] = null;
+            //     // Remove from queue
+            //     let index = this.p_v_p.queue.indexOf(1);
+            //     if (index > -1) {
+            //       this.p_v_p.queue.splice(index, 1);
+            //     }
+            // } else{
+            //     console.log("A pokemon was unselected but never selected. This is kindof a problem?")
+            // }
+
+            for (let i of [0,1,2,3,4,5]){
+                if(this.team[i] === d.pokedex_number){
+                    this.team[i] = null;
+                    // Remove from queue
+                    let index = this.team.queue.indexOf(i);
+                    if (index > -1) {
+                      this.team.queue.splice(index, 1);
+                    }
+                    break;
+                }
+            }
+
+
+        }
+        console.log(this.team)
+        this.update_team_checks();
+    }
 
 
 
@@ -66,16 +210,16 @@ class Pokedex {
         header_row.append("th").text("PvP");
         rows.append("td").append("input")
             .attr("type", "checkbox")
+            .attr("id", p=> "pvp_"+p.pokedex_number)
             .classed("pvp_checkbox", true)
-            // .on('click', this.p_v_p_change);
+            .on('click', (d,i) => this.p_v_p_change(d,i));
 
         header_row.append("th").text("Team");
         rows.append("td").append("input")
             .attr("type", "checkbox")
+            .attr("id", p=> "team_"+p.pokedex_number)
             .classed("teambuilder_checkbox", true)
-            // .on('click', function(d,i) {
-            //     self.teambuilder_change(d, i, self)
-            // });
+            .on('click', (d,i) => this.teambuilder_change(d,i));
 
         header_row.append("th").text("Dex #");
         rows.append("td").text(p=> p.pokedex_number);
@@ -128,8 +272,8 @@ class Pokedex {
         // header_row.append("th").text("Height (m)");
         // rows.append("td").text(p=> p.height_m);
 
-        rows.on("mouseover", (d,i) => console.log(d));
-        rows.on("mouseout", () => console.log("MOUSEOUT"));
+        // rows.on("mouseover", (d,i) => console.log(d));
+        // rows.on("mouseout", () => console.log("MOUSEOUT"));
 
 
         // Takes care of that nasty sorting business
