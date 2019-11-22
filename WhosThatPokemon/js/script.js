@@ -14,23 +14,24 @@ loadData().then(pokemon => {
 
 
 async function loadData() {
-    let pokemon = await loadFile("data/pokemon_data/pokemon.csv");
+    let pokemon = await loadFile("data/pokemon_data/main_collection.csv");
     return pokemon
 }
 
 async function loadFile(file) {
-    let data = await d3.csv(file).then(d => {
-        let mapped = d.map(g => {
-            for (let key in g) {
-                let numKey = +key;
-                if (numKey) {
-                    g[key] = +g[key];
-                }
-            }
-            return g;
-        });
-        return mapped;
-    });
+    let data = await d3.csv(file);
+        //.then(d => {
+    //     let mapped = d.map(g => {
+    //         for (let key in g) {
+    //             let numKey = +key;
+    //             if (numKey) {
+    //                 g[key] = +g[key];
+    //             }
+    //         }
+    //         return g;
+    //     });
+    //     return mapped;
+    // });
     return data;
 }
 
