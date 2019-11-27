@@ -3,7 +3,7 @@ class Matchups{
         this.poke_dict = pokemon;
         this.mons = Object.values(pokemon).sort((a,b)=>+a.long_id - +b.long_id);
 
-        this.vs_selection = ['001', '123'];
+        this.vs_selection = ['001', '133'];
         this.team_selection = ['003', '242', '321', '500', '292', '141'];
 
         this.current_view = "vs";
@@ -55,17 +55,11 @@ class Matchups{
 
             $("#vs_dd_"+j).select2().on("select2:select", function(evt) {
                     let mon = d3.select(evt.params.data.element).datum();
-                    console.log(mon.long_id);
                     that.vs_selection[j] = mon.long_id
                     that.draw_card(mon.long_id, "#vs_svg_" + j);
             });
 
             pane.select("select")
-                // .on("change", function() {
-                //     let newVal = eval(d3.select(this).property('value'));
-                //     console.log(newVal);
-                //     that.draw_card(newVal, "#vs_svg_" + j);
-                // })
                 .selectAll("option").data(this.mons).join("option")
                 .property("selected", d=>d.long_id === this.vs_selection[j])
                 .attr("value", d=>d.long_id)
@@ -74,7 +68,7 @@ class Matchups{
             pane.append("svg")
                 .attr("id", "vs_svg_" + j)
                 .attr("width", 430)
-                .attr("height", 200)
+                .attr("height", 235)
                 .style("border", "1pt solid black")
 
         }
@@ -83,8 +77,7 @@ class Matchups{
 
             $("#tb_dd_"+j).select2().on("select2:select", function(evt) {
                     let mon = d3.select(evt.params.data.element).datum();
-                    console.log(mon.long_id);
-                    that.team_selection[j] = mon.long_id
+                    that.team_selection[j] = mon.long_id;
                     that.draw_card(mon.long_id, "#tb_svg_" + j);
             });
 
@@ -96,7 +89,7 @@ class Matchups{
             pane.append("svg")
                 .attr("id", "tb_svg_" + j)
                 .attr("width", 430)
-                .attr("height", 200)
+                .attr("height", 235)
                 .style("border", "1pt solid black");
         }
     }
@@ -123,14 +116,13 @@ class Matchups{
     draw_card(id, svg_id) {
 
         let stat_labels = ["hp","atk","def","s.a.", "s.d.", "spd"];
-        console.log(this.team_selection, this.vs_selection);
         d3.select(svg_id).select("g").remove();
         let pallet = d3.select(svg_id).append("g");
         let mon = this.poke_dict[id];
         pallet.append("rect")
             .attr("x", 5)
             .attr("y", 5)
-            .attr("height", 190)
+            .attr("height", 220)
             .attr("width", 420)
             .attr("rx", 10)
             .attr("fill", this.type_colors[mon.type1][0]);
@@ -146,10 +138,10 @@ class Matchups{
             .attr("x", 10)
             .attr("y", 10)
             .attr("height", 100)
-            .attr("width", 100)
+            .attr("width", 100);
 
         let bar_group = pallet.append("g")
-            .attr("transform", "translate(120,10)")
+            .attr("transform", "translate(120,10)");
 
         bar_group.append("rect")
             .attr("x", 0)
@@ -158,7 +150,7 @@ class Matchups{
             .attr("height", 130)
             .attr('rx', 10)
             .attr("fill", "#fff8d6")
-            .attr("stroke", this.type_colors[this.poke_dict[id].type1][1])
+            .attr("stroke", this.type_colors[mon.type1][1])
             .attr("stroke-width", "3pt");
 
         let chart_group = bar_group.append("g")
@@ -205,6 +197,105 @@ class Matchups{
             .attr("x", 0)
             .attr("y", 13)
             .text(((mon.type2 !== '') && (mon.type1 !== mon.type2) ?mon.type1 +' & '+ mon.type2 :mon.type1));
+
+
+        info_group.append("text")
+            .attr("x", 0)
+            .attr("y", 40)
+            .text("height:")
+            .style("font-size", "10pt");
+
+        info_group.append("text")
+            .attr("x", 10)
+            .attr("y", 54)
+            .text((mon.height_m ? mon.height_m : "???") + " m")
+            .style("font-size", "10pt");
+
+        info_group.append("text")
+            .attr("x", 0)
+            .attr("y", 72)
+            .text("weight:")
+            .style("font-size", "10pt");
+
+        info_group.append("text")
+            .attr("x", 10)
+            .attr("y", 86)
+            .text((mon.weight_kg ? mon.weight_kg : "???") + " kg")
+            .style("font-size", "10pt");
+
+        let prev_ev = mon.ev_from;
+        let next_evs = mon.ev_to;
+
+        console.log(id, next_evs);
+
+        if (prev_ev) {
+            let prev_group = pallet.append("g")
+                .attr("transform", "translate(130, 165)");
+
+            prev_group.append("text")
+                .text("Evolves From:")
+                .style("font-size", "8pt")
+                .style("text-anchor", "middle")
+                .attr("x", 10)
+                .attr("y", 0);
+
+            prev_group.append("circle")
+                .attr("cx", 10)
+                .attr("cy", 25)
+                .attr("r", 20)
+                .attr("fill", this.type_colors[mon.type1][1]);
+
+            prev_group.append("image")
+                .attr("href", "data/pokemon_data/sprites/" + prev_ev + ".png")
+                .attr("x", -10)
+                .attr("y", 7)
+                .attr("width", 40)
+                .attr("height", 40)
+                .style("cursor", "pointer");
+
+            prev_group.append("text")
+                .text(this.poke_dict[prev_ev].name)
+                .attr("x", 10)
+                .attr("y", 52)
+                .style("text-anchor", "middle")
+                .style("font-size", "8pt")
+        }
+
+        if (next_evs.length > 0) {
+            let next_group = pallet.append("g")
+                .attr("transform", "translate(400, 165)");
+
+            next_group.append("text")
+                .text("Evolves To:")
+                .style("text-anchor", "end")
+                .style("font-size", "8pt")
+                .attr("x", id==="133"?-140:20)
+                .attr("y", 0);
+
+            let groups = next_group.selectAll("g").data(next_evs).join("g")
+                .attr("transform", (d,i) => "translate(" +( -20 + i*-45 )+ ", 10)")
+
+            groups.append("circle")
+                .attr("cx", 20)
+                .attr("cy", 15)
+                .attr("r", 20)
+                .attr("fill", this.type_colors[mon.type1][1]);
+
+            groups.append("image")
+                .attr("href", d=> "data/pokemon_data/sprites/" + d + ".png")
+                .attr("x", 0)
+                .attr("y", -3)
+                .attr("height", 40)
+                .attr("width", 40)
+                .style("cursor", "pointer");
+
+            groups.append("text")
+                .text(d=> this.poke_dict[d].name)
+                .attr("x", 20)
+                .attr("y", 42)
+                .style("text-anchor", "middle")
+                .style("font-size", "8pt")
+        }
 
 
 
