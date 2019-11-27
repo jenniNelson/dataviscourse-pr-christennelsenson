@@ -4,10 +4,12 @@ loadData().then(poke_dict => {
 
     console.log(poke_dict)
 
-    let callbacks = new Callbacks();
-    let pokedex = new Pokedex(poke_dict, callbacks);
+    let card_manager = new CardManager();
+    let pokedex = new Pokedex(poke_dict, card_manager);
     let matchupview = new Matchups(poke_dict);
-    let mapview = new MapView(poke_dict);
+    let mapview = new MapView(poke_dict, card_manager);
+
+    card_manager.update_objects();
 
     console.log(pokedex);
 
@@ -77,8 +79,136 @@ async function loadFile(file) {
     return data;
 }
 
-class Callbacks{
+class CardManager{
     constructor() {
+        this.vs = {
+            0: null,
+            1: null,
+            queue: []
+        };
+        this.team = {
+            0: null,
+            1: null,
+            2: null,
+            3: null,
+            4: null,
+            5: null,
+            queue: []
+        };
+
+        this.callbacks = []
+    }
+
+    add_callback(callback){
+        this.callbacks.push(callback)
+    }
+
+    update_pokemon(which_list, which_card, to_who, checkbox=null){
+        if(which_list==="vs" || which_list==="pvp"){
+            this.update_vs(which_card, to_who, checkbox)
+        } else if(which_list==="team"){
+            this.update_team(which_card, to_who, checkbox)
+        }
+    }
+
+    update_team(which_card, to_who, checkbox=null){
+
+        // Not a checkbox-style change
+        if(checkbox === null){
+            let index = this.team.queue.indexOf(which_card);
+            if (index > -1) {
+              this.team.queue.splice(index, 1);
+            }
+            this.team[which_card] = to_who;
+            this.team.queue.push(i);
+
+        }
+        if(checkbox === true) {
+            let none_free = true;
+            for (let i of [0, 1, 2, 3, 4, 5]) {
+                if (this.team[i] == null) {
+                    this.team[i] = to_who;
+                    this.team.queue.push(i);
+                    none_free = false;
+                    break;
+                }
+            }
+            if (none_free) {
+                let one_to_displace = this.team.queue.shift();
+                one_to_displace = one_to_displace === undefined ? 0 : one_to_displace;
+                this.team[one_to_displace] = to_who;
+                this.team.queue.push(one_to_displace);
+            }
+        } else if(checkbox === false){
+            for (let i of [0,1,2,3,4,5]){
+                if(this.team[i] === to_who){
+                    this.team[i] = null;
+                    // Remove from queue
+                    let index = this.team.queue.indexOf(i);
+                    if (index > -1) {
+                      this.team.queue.splice(index, 1);
+                    }
+                    break;
+                }
+            }
+        }
+
+        this.update_objects()
+    }
+
+    update_vs(which_card, to_who, checkbox=null){
+
+        // Not a checkbox-style change
+        if(checkbox === null){
+            let index = this.vs.queue.indexOf(which_card);
+            if (index > -1) {
+              this.vs.queue.splice(index, 1);
+            }
+            this.vs[which_card] = to_who;
+            this.vs.queue.push(i);
+
+        }
+        if(checkbox === true) {
+            let none_free = true;
+            for (let i of [0, 1]) {
+                if (this.vs[i] == null) {
+                    this.vs[i] = to_who;
+                    this.vs.queue.push(i);
+                    none_free = false;
+                    break;
+                }
+            }
+            if (none_free) {
+                let one_to_displace = this.vs.queue.shift();
+                one_to_displace = one_to_displace === undefined ? 0 : one_to_displace;
+                this.vs[one_to_displace] = to_who;
+                this.vs.queue.push(one_to_displace);
+            }
+        } else if(checkbox === false){
+            for (let i of [0,1]){
+                if(this.vs[i] === to_who){
+                    this.vs[i] = null;
+                    // Remove from queue
+                    let index = this.vs.queue.indexOf(i);
+                    if (index > -1) {
+                      this.vs.queue.splice(index, 1);
+                    }
+                    break;
+                }
+            }
+        }
+
+        this.update_objects()
+    }
+
+    update_objects(){
+
+        console.log(this.team, this.vs, this.callbacks)
+
+        for (let cb of this.callbacks){
+            cb();
+        }
+
     }
 
 }
