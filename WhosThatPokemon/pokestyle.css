@@ -1,5 +1,5 @@
 body, button{
-    font-family: "Gill Sans";
+    font-family: "Gill Sans", "sans-serif";
 }
 
 thead,
@@ -25,6 +25,10 @@ table{
 
   overflow-x:scroll;
   /*table-layout: fixed;*/
+}
+
+.hidden{
+    display: none
 }
 
 

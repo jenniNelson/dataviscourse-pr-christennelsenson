@@ -44,8 +44,45 @@ class Matchups{
         this.stat_scale =d3.scaleLinear().domain([0,250]).range([0,250]);
         this.stat_axis = d3.axisBottom(this.stat_scale).tickSize(100).ticks(5);
 
+        this.initialize_tabs();
         this.fill_dropdowns();
         this.initialize_cards();
+    }
+
+    initialize_tabs() {
+        let that = this;
+        d3.selectAll("#view_switcher .tablinks").data(["vs", "team"])
+            .on("click", that.switch_tabs);
+        console.log("heer");
+        d3.select("#vs_button")
+            .classed("active", true);
+    }
+
+    switch_tabs(name) {
+        d3.selectAll(".lef_table")
+            .classed("hidden", true);
+        d3.selectAll("#view_switcher .tablinks")
+            .classed("active", false);
+
+        console.log(name, this.current_view);
+
+        if (name === "vs" && this.current_view !== "vs") {
+            d3.select("#vs_button")
+                .classed("active", true);
+            d3.select("#vs_table")
+                .classed("hidden", false);
+            this.current_view = "vs"
+        } else if (name === "team" && this.current_view !== "team") {
+            d3.select("#team_builder_button")
+                .classed("active", true);
+            d3.select("#team_build_table")
+                .classed("hidden", false);
+            this.current_view = "team"
+        }
+
+        console.log("Clicked", this.current_view)
+
+
     }
 
     fill_dropdowns() {
@@ -68,8 +105,8 @@ class Matchups{
             pane.append("svg")
                 .attr("id", "vs_svg_" + j)
                 .attr("width", 430)
-                .attr("height", 235)
-                .style("border", "1pt solid black")
+                .attr("height", 225)
+                // .style("border", "1pt solid black")
 
         }
         for (let j = 0; j < this.num_team; j++) {
@@ -89,8 +126,8 @@ class Matchups{
             pane.append("svg")
                 .attr("id", "tb_svg_" + j)
                 .attr("width", 430)
-                .attr("height", 235)
-                .style("border", "1pt solid black");
+                .attr("height", 225)
+                // .style("border", "1pt solid black");
         }
     }
 
@@ -226,8 +263,6 @@ class Matchups{
         let prev_ev = mon.ev_from;
         let next_evs = mon.ev_to;
 
-        console.log(id, next_evs);
-
         if (prev_ev) {
             let prev_group = pallet.append("g")
                 .attr("transform", "translate(130, 165)");
@@ -296,10 +331,6 @@ class Matchups{
                 .style("text-anchor", "middle")
                 .style("font-size", "8pt")
         }
-
-
-
-
     }
 }
 
