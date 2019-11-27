@@ -34,59 +34,91 @@
 
 </div>
 <div class="background">
-    <table>
+    <table style="width: 1800px">
         <tr>
-            <td style="vertical-align: top; width: 600px">
+            <td style="vertical-align: top; width: 900px">
 
                 <div class="vs_area" style="vertical-align: center">
-                    <table style="width: 100%">
-                        <tr>
-                            <td style="width: 30%; text-align: right"></td>
-                            <td id="switch_container" style="width: 40%">
-                                <button style="horiz-align: center; margin-left: 10%; margin-right: 10%" id="vs_to_team_toggle">
-                                    Switch to Team Builder View
-                                </button>
-                            </td>
-                            <td style="width:30%; text-align: left"></td>
-                        </tr>
-                    </table>
+                    <!--<table style="width: 100%; ">-->
+                        <!--<tr>-->
+                            <!--<td style="width: 30%; text-align: right"></td>-->
+                            <!--<td id="switch_container" style="width: 40%">-->
+                                <!--<button style="horiz-align: center; margin-left: 10%; margin-right: 10%" id="vs_to_team_toggle">-->
+                                    <!--Switch to Team Builder View-->
+                                <!--</button>-->
+                            <!--</td>-->
+                            <!--<td style="width:30%; text-align: left"></td>-->
+                        <!--</tr>-->
+                    <!--</table>-->
+
+                    <div class="tab" id="view_switcher">
+                        <button class="tablinks active" id="vs_button">Vs View</button>
+                        <button class="tablinks" id="team_builder_button">Team Builder</button>
+                    </div>
 
                     <table id="vs_table" align="center">
                         <tr>
-                            <td id="left_pokemon_pane" class="vs_pane" align="center">
-                                <div style="margin-left: 5%; margin-right: 5%" id="leftContainer">
-                                    <select class="js-example-basic-single" id="left_dropdown">
-                                        <option value="001" selected>Bulbasaur (#001)</option>
-                                        <option value="002">(none)</option>
-                                    </select>
-                                    <img alt="Image of Bulbasaur" width="100" height="100" style="object-fit: contain; border: 1px solid" src="data/pokemon_data/sprites/001.png" />
-                                    <div style="width: 100%" id="right_info_pane" align="left">
-                                        <div>HP: 45</div>
-                                        <div>Attack: 49</div>
-                                        <div>Defense: 49</div>
-                                        <div>Sp Attack: 65</div>
-                                        <div>Sp Defense: 65</div>
-                                        <div>Speed: 45</div>
-                                    </div>
+                            <td id="vs_0" class="vs_pane" align="center">
+                                <div style="margin-left: 5%; margin-right: 5%">
+                                    <select class="js-example-basic-single poke_selector" id="vs_dd_0"></select>
                                 </div>
                             </td>
-                            <td id="right_pokemon_pane" class="vs_pane" align="center">
-                                <div style="margin-left: 5%; margin-right: 5%;" id="rightContainer">
-                                <select class="js-example-basic-single" id="right_dropdown">
-                                    <option value="321" selected>Wailord (#321)</option>
-                                    <option value="002">(none)</option>
-                                </select>
-                                    <img width="100" height="100" style="object-fit: contain; border: 1px solid" src="data/pokemon_data/sprites/321.png" />
-                                    <div style="width: 100%" id="left_info_pane" align="left">
-                                        <div>HP: 170</div>
-                                        <div>Attack: 90</div>
-                                        <div>Defense: 45</div>
-                                        <div>Sp Attack: 90</div>
-                                        <div>Sp Defense: 45</div>
-                                        <div>Speed: 60</div>
-                                    </div>
+                            <td id="vs_1" class="vs_pane" align="center">
+                                <div style="margin-left: 5%; margin-right: 5%">
+                                    <select class="js-example-basic-single poke_selector" id="vs_dd_1"></select>
                                 </div>
                             </td>
+                        </tr>
+                    </table>
+
+
+
+
+                    <table id="team_build_table" align="center" >
+                        <tr>
+                            <td id="tb_0" class="vs_pane" align="center">
+
+                                <div style="margin-left: 5%; margin-right: 5%">
+                                    <select class="js-example-basic-single poke_selector" id="tb_dd_0"></select>
+                                </div>
+                            </td>
+                            <td id="tb_1" class="vs_pane" align="center">
+
+                                <div style="margin-left: 5%; margin-right: 5%">
+                                    <select class="js-example-basic-single poke_selector" id="tb_dd_1"></select>
+                                </div>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td id="tb_2" class="vs_pane" align="center">
+
+                                <div style="margin-left: 5%; margin-right: 5%">
+                                    <select class="js-example-basic-single poke_selector" id="tb_dd_2"></select>
+                                </div>
+                            </td>
+                            <td id="tb_3" class="vs_pane" align="center">
+
+                                <div style="margin-left: 5%; margin-right: 5%">
+                                    <select class="js-example-basic-single poke_selector" id="tb_dd_3"></select>
+                                </div>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td id="tb_4" class="vs_pane" align="center">
+
+                                <div style="margin-left: 5%; margin-right: 5%">
+                                    <select class="js-example-basic-single poke_selector" id="tb_dd_4"></select>
+                                </div>
+                            </td>
+                            <td id="tb_5" class="vs_pane" align="center">
+
+                                <div style="margin-left: 5%; margin-right: 5%">
+                                    <select class="js-example-basic-single poke_selector" id="tb_dd_5"></select>
+                                </div>
+                            </td>
+
                         </tr>
                     </table>
                     <div style="width: 100%; border: 1px solid" id="matchup_summary">
@@ -96,7 +128,7 @@
                 </div>
 
             </td>
-            <td style="vertical-align: top; width: 800px">
+            <td style="vertical-align: top; width: 900px">
                 <div id="map_area">
                     <div class="tab">
 

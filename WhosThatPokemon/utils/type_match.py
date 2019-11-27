@@ -21,7 +21,7 @@ types = [
 
 
 # class combo:
-
+#     def __init__(self, type1, type2):
 
 matchups = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, .5, 0, 1, 1, .5, 1],

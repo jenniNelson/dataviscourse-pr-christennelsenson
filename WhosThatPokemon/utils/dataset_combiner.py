@@ -8,6 +8,8 @@ class Pokeclass:
         self.type2 = input_data[37]
         self.id = int(input_data[32])
         self.long_id = "{:03d}".format(self.id)
+
+        self.capture_rate = input_data[23]
         self.gen_introduced = input_data[39]
         self.is_legendary = input_data[40]
         self.height = input_data[27]
@@ -74,13 +76,15 @@ if __name__ == '__main__':
         writer.writerow(['name', 'long_id',
                          'stat_total', 'hp', 'attack', 'defense', 'sp_attack', 'sp_defense', 'speed',
                          'type1', 'type2', 'ev_from', 'ev_to', 'is_base', 'is_full_ev', 'evo_family',
-                         'gen_introduced', 'is_legendary', 'height_m', 'weight_kg', 'locations'])
+                         'capture_rate', 'gen_introduced', 'is_legendary', 'height_m', 'weight_kg',
+                         'locations'])
         for key in mon_dict.keys():
             mon = mon_dict[key]
             writer.writerow([mon.name, mon.long_id,
                              mon.total, mon.hp, mon.attack, mon.defense, mon.sp_attack, mon.sp_defense, mon.speed,
                              mon.type1, mon.type2, mon.ev_from, mon.ev_to, mon.is_base, mon.is_full_ev, mon.evo_family,
-                             mon.gen_introduced, mon.is_legendary, mon.height, mon.weight, mon.locations])
+                             mon.capture_rate, mon.gen_introduced, mon.is_legendary, mon.height, mon.weight,
+                             mon.locations])
 
 
 

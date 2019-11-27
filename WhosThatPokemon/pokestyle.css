@@ -226,6 +226,10 @@ span.ultra_moon {
     vertical-align: center;
 }
 
+#team_build_table {
+    width: 100%
+}
+
 #left_pokemon_pane {
 
 }
@@ -238,11 +242,19 @@ span.ultra_moon {
     /*position: relative;*/
     /*left: 5%;*/
     /*right: 5%;*/
-    width: 100%
+    width: 80%
 }
 
 #right_dropdown {
-    width: 100%
+    width: 80%
+}
+
+.poke_selector {
+    width: 80%
+}
+
+.tick line {
+    opacity: 70%;
 }
 
 /*#switch_container {*/

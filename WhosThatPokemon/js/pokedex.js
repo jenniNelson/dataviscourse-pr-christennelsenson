@@ -5,7 +5,7 @@ class Pokedex {
     constructor(pokemon, callback_object_or_whatever) {
 
 
-        this.pokemon = pokemon;
+        this.pokemon = Object.values(pokemon).sort( (a,b) => +a.long_id - +b.long_id );
 
         this.p_v_p = {
             0: null,
@@ -53,7 +53,7 @@ class Pokedex {
     p_v_p_change(d,i){
 
 
-        let chkbx = d3.select("#pvp_"+d.pokedex_number)
+        let chkbx = d3.select("#pvp_"+d.long_id)
 
         console.log("PVP Checked/unchecked: ", d,i, this, chkbx)
 
@@ -64,28 +64,28 @@ class Pokedex {
         if(is_checked){
 
             if (this.p_v_p[0] == null){
-                this.p_v_p[0] = d.pokedex_number;
+                this.p_v_p[0] = d.long_id;
                 this.p_v_p.queue.push(0);
             } else if (this.p_v_p[1] == null){
-                this.p_v_p[1] = d.pokedex_number;
+                this.p_v_p[1] = d.long_id;
                 this.p_v_p.queue.push(1);
             } else{
                 let one_to_displace = this.p_v_p.queue.shift();
                 one_to_displace = one_to_displace === undefined ? 0 : one_to_displace;
-                this.p_v_p[one_to_displace] = d.pokedex_number;
+                this.p_v_p[one_to_displace] = d.long_id;
                 this.p_v_p.queue.push(one_to_displace);
             }
 
 
         } else {
-            if(this.p_v_p[0] === d.pokedex_number){
+            if(this.p_v_p[0] === d.long_id){
                 this.p_v_p[0] = null;
                 // Remove from queue
                 let index = this.p_v_p.queue.indexOf(0);
                 if (index > -1) {
                   this.p_v_p.queue.splice(index, 1);
                 }
-            } else if(this.p_v_p[1] === d.pokedex_number){
+            } else if(this.p_v_p[1] === d.long_id){
                 this.p_v_p[1] = null;
                 // Remove from queue
                 let index = this.p_v_p.queue.indexOf(1);
@@ -118,7 +118,7 @@ class Pokedex {
 
     teambuilder_change(d,i){
 
-        let chkbx = d3.select("#team_"+d.pokedex_number)
+        let chkbx = d3.select("#team_"+d.long_id)
 
         console.log("Team Checked/unchecked: ", d,i, this, chkbx)
 
@@ -129,22 +129,22 @@ class Pokedex {
         if(is_checked){
 
             // if (this.p_v_p[0] == null){
-            //     this.p_v_p[0] = d.pokedex_number;
+            //     this.p_v_p[0] = d.long_id;
             //     this.p_v_p.queue.push(0);
             // } else if (this.p_v_p[1] == null){
-            //     this.p_v_p[1] = d.pokedex_number;
+            //     this.p_v_p[1] = d.long_id;
             //     this.p_v_p.queue.push(1);
             // } else{
             //     let one_to_displace = this.p_v_p.queue.shift();
             //     one_to_displace = one_to_displace === undefined ? 0 : one_to_displace;
-            //     this.p_v_p[one_to_displace] = d.pokedex_number;
+            //     this.p_v_p[one_to_displace] = d.long_id;
             //     this.p_v_p.queue.push(one_to_displace);
             // }
 
             let none_free = true;
             for (let i of [0,1,2,3,4,5]){
                 if (this.team[i] == null) {
-                    this.team[i] = d.pokedex_number;
+                    this.team[i] = d.long_id;
                     this.team.queue.push(i);
                     none_free = false;
                     break;
@@ -153,20 +153,20 @@ class Pokedex {
             if (none_free){
                 let one_to_displace = this.team.queue.shift();
                 one_to_displace = one_to_displace === undefined ? 0 : one_to_displace;
-                this.team[one_to_displace] = d.pokedex_number;
+                this.team[one_to_displace] = d.long_id;
                 this.team.queue.push(one_to_displace);
             }
 
 
         } else {
-            // if(this.p_v_p[0] === d.pokedex_number){
+            // if(this.p_v_p[0] === d.long_id){
             //     this.p_v_p[0] = null;
             //     // Remove from queue
             //     let index = this.p_v_p.queue.indexOf(0);
             //     if (index > -1) {
             //       this.p_v_p.queue.splice(index, 1);
             //     }
-            // } else if(this.p_v_p[1] === d.pokedex_number){
+            // } else if(this.p_v_p[1] === d.long_id){
             //     this.p_v_p[1] = null;
             //     // Remove from queue
             //     let index = this.p_v_p.queue.indexOf(1);
@@ -178,7 +178,7 @@ class Pokedex {
             // }
 
             for (let i of [0,1,2,3,4,5]){
-                if(this.team[i] === d.pokedex_number){
+                if(this.team[i] === d.long_id){
                     this.team[i] = null;
                     // Remove from queue
                     let index = this.team.queue.indexOf(i);
@@ -210,25 +210,25 @@ class Pokedex {
         header_row.append("th").text("PvP");
         rows.append("td").append("input")
             .attr("type", "checkbox")
-            .attr("id", p=> "pvp_"+p.pokedex_number)
+            .attr("id", p=> "pvp_"+p.long_id)
             .classed("pvp_checkbox", true)
             .on('click', (d,i) => this.p_v_p_change(d,i));
 
         header_row.append("th").text("Team");
         rows.append("td").append("input")
             .attr("type", "checkbox")
-            .attr("id", p=> "team_"+p.pokedex_number)
+            .attr("id", p=> "team_"+p.long_id)
             .classed("teambuilder_checkbox", true)
             .on('click', (d,i) => this.teambuilder_change(d,i));
 
         header_row.append("th").text("Dex #");
-        rows.append("td").text(p=> p.pokedex_number);
+        rows.append("td").text(p=> p.long_id);
 
         header_row.append("th").text("Name");
         rows.append("td").text(p=> p.name);
 
         header_row.append("th").text("Base Total");
-        rows.append("td").text(p=> p.base_total);
+        rows.append("td").text(p=> p.stat_total);
 
         header_row.append("th").text("HP");
         rows.append("td").text(p=> p.hp);
@@ -267,7 +267,7 @@ class Pokedex {
         rows.append("td").text(p=> p.is_legendary==="1" ? "Yes" : "No");
 
         header_row.append("th").text("Orig. Gen");
-        rows.append("td").text(p=> p.generation);
+        rows.append("td").text(p=> p.gen_introduced);
 
         // header_row.append("th").text("Height (m)");
         // rows.append("td").text(p=> p.height_m);
