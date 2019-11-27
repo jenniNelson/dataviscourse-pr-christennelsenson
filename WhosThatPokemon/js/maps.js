@@ -63,9 +63,9 @@ function location_sort(a,b) {
     if (a.place.startsWith("Route") && b.place.startsWith("Route")) {
         return +a.place.split(' ')[1] - +b.place.split(' ')[1]
     } else if (a.place.startsWith("Route")) {
-        return 1;
-    } else if (b.place.startsWith("Route")) {
         return -1;
+    } else if (b.place.startsWith("Route")) {
+        return 1;
     } else {
         if (a.place < b.place) return -1;
         if (a.place > b.place) return 1;
@@ -74,22 +74,25 @@ function location_sort(a,b) {
 }
 
 class MapView {
-    constructor(loc_data){
+    constructor(loc_data, card_manager){
+
+        let that = this;
+        function update_pokemon()
+        {
+            for (let i of [0, 1, 2, 3, 4, 5]) {
+                let spot = d3.select('#map_poke_' + i);
+                let the_poke = that.loc_data[that.card_manager.team[i]];
+                that.make_location_card(spot, the_poke);
+            }
+        }
+        this.card_manager = card_manager;
+        this.card_manager.add_callback(update_pokemon);
 
         this.loc_data = loc_data;
         this.opened_map = undefined;
 
         this.initialize_maps_and_tabs()
 
-        this.update_pokemon({
-            0: "001",
-            1: "321",
-            2: null,
-            3: "022",
-            4: null,
-            5: "026",
-            queue: [5,1,0,3]
-        })
     }
 
     initialize_maps_and_tabs(){
@@ -227,19 +230,25 @@ class MapView {
     }
 
     make_location_card(selection, mon){
-        console.log(selection, mon);
+
         // Clear old art
         selection.html("");
 
-        let row = selection.append("table").append("tr");
+        selection = selection
+            .append("div")
+            .attr("padding", "10px")
 
-        let poke_pic = row.append("td").append("svg");
-
-
-
-        let locs_td = row.append("td");
+        let poke_pic = selection
+            .append("div")
+            .attr("style","float:left")
+            .append("svg")
+            .attr("width", "120px")
+            .attr("height", "120px")
+        let locs_td = selection.append("div")//.attr("style","float:right;width:50%")
 
         if( mon != null ){
+
+            selection.attr("style", "border-radius:15px;background-color:" + type_colors[mon.type1][0])
 
         let ordered_locations = Object.values(
             mon.locations.filter(x => x.map === this.opened_map)
@@ -253,13 +262,6 @@ class MapView {
                 return accum;
             }, {})).sort(location_sort);
 
-            poke_pic.append("rect")
-                .attr("x", 0)
-                .attr("y", 0)
-                .attr("height", 120)
-                .attr("width", 120)
-                .attr("rx", 10)
-                .attr("fill", type_colors[mon.type1][0]);
 
             poke_pic.append("circle")
                 .attr("cx", 60)
@@ -278,7 +280,18 @@ class MapView {
                     .on("mouseout", () => this.unhighlight_pokemon_regions(ordered_locations))
 
 
-
+            locs_td.append("div")
+                .text(mon.name);
+            let row = locs_td.append("div")
+                .attr("style", "height:100px;overflow:auto;")
+                .append("table")
+                .selectAll("tr")
+                .data(ordered_locations)
+                .join("tr")
+                .on("mouseover", d => this.highlight_region(d))
+                .on("mouseout", d => this.unhighlight_region(d));
+            row.append("td")
+                .text(d =>d.place);
 
 
         } else {
@@ -306,138 +319,4 @@ class MapView {
 
     }
 
-    update_pokemon(poke_dict){
-
-        for (let i of [0,1,2,3,4,5]){
-            let spot = d3.select('#map_poke_' + i);
-            let the_poke = this.loc_data[poke_dict[i]];
-
-            this.make_location_card(spot, the_poke);
-
-        }
-
-
-        // for (let i of [0,1,2,3,4,5]){
-
-
-            // let the_poke = d3.select('#map_poke_' + i);
-            // the_poke.html("");
-            // let row = the_poke.append("table").append("tr")
-            // let img_td = row.append("td");
-            // let locs_td = row.append("td");
-            // if( poke_dict[i] != null) {
-            //
-            //     let game_to_acro = {
-            //         "Pokémon Red" : [{game:"Pokémon Red", text: "R", id: "red"}],
-            //         "Pokémon Blue" : [{game:"Pokémon Blue", text: "B", id: "blue"}],
-            //         "Pokémon Yellow" : [{game:"Pokémon Yellow", text: "Y", id: "yellow"}],
-            //         "Pokémon Red (Intl.)" : [{game:"Pokémon Red (Intl.)", text: "R", id: "red"}],
-            //         "Pokémon Blue (Intl.)" : [{game:"Pokémon Blue (Intl.)", text: "B", id: "blue"}],
-            //         "Pokémon Yellow (Intl.)" : [{game:"Pokémon Yellow (Intl.)", text: "Y", id: "yellow"}],
-            //         "Pokémon Red (Jp.)" : [{game:"Pokémon Red (Jp.)", text: "R(j)", id: "red_jp"}],
-            //         "Pokémon Blue (Jp.)" : [{game:"Pokémon Blue (Jp.)", text: "B(j)", id: "blue_jp"}],
-            //         "Pokémon Green (Jp.)" : [{game:"Pokémon Green (Jp.)", text: "G(j)", id: "green_jp"}],
-            //         "Pokémon Pikachu (Jp.)" : [{game:"Pokémon Pikachu (Jp.)", text: "Pk(j)", id: "pikachu_jp"}],
-            //         "Pokémon Gold" : [{game:"Pokémon Gold", text: "G", id: "gold"}],
-            //         "Pokémon Silver" : [{game:"Pokémon Silver", text: "S", id: "silver"}],
-            //         "Pokémon Crystal" : [{game:"Pokémon Crystal", text: "C", id: "crystal"}],
-            //         "SoulSilver" : [{game:"SoulSilver", text: "SS", id: "soul_silver"}],
-            //         "HeartGold" : [{game:"HeartGold", text: "HG", id: "heart_gold"}],
-            //         "Ruby" : [{game:"Ruby", text: "Rby", id: "ruby"}],
-            //         "Sapphire" : [{game:"Sapphire", text: "Sph", id: "sapphire"}],
-            //         "Emerald" : [{game:"Emerald", text: "E", id: "emerald"}],
-            //         "FireRed" : [{game:"FireRed", text: "FR", id: "fire_red"}],
-            //         "LeafGreen" : [{game:"LeafGreen", text: "LG", id: "leaf_green"}],
-            //         "Diamond" : [{game:"Diamond", text: "D", id: "diamond"}],
-            //         "Pearl" : [{game:"Pearl", text: "P", id: "pearl"}],
-            //         "Platinum" : [{game:"Platinum", text: "Pl", id: "platinum"}],
-            //         "Black" : [{game:"Black", text: "B", id: "black"}],
-            //         "White" : [{game:"White", text: "W", id: "white"}],
-            //         "Black 2" : [{game:"Black 2", text: "B2", id: "black_2"}],
-            //         "White 2" : [{game:"White 2", text: "W2", id: "white_2"}],
-            //         "X" : [{game:"X", text: "X", id: "y"}],
-            //         "Y" : [{game:"Y", text: "Y", id: "x"}],
-            //         "Omega Ruby" : [{game:"Omega Ruby", text: "OR", id: "omega_ruby"}],
-            //         "Alpha Sapphire" : [{game:"Alpha Sapphire", text: "AS", id: "alpha_sapphire"}],
-            //         "Sun" : [{game:"Sun", text: "Sun", id: "sun"}],
-            //         "Moon" : [{game:"Moon", text: "Moon", id: "moon"}],
-            //         "Ultra Sun" : [{game:"Ultra Sun", text: "USun", id: "ultra_sun"}],
-            //         "Ultra Moon" :[{game:"Ultra Moon", text: "UMoon", id: "ultra_moon"}],
-            //         "Pokémon Green (Jp.) | Pokémon Blue (Intl.)" : [{game:"Pokémon Green (Jp.)", text: "G(j)", id: "green_jp"},{game: "Pokémon Blue (Jp.)", text: "B", id: "blue"}]
-            //     };
-            //
-            //     // Combine
-            //     let ordered_locations = Object.values( this.loc_data[poke_dict[i]].locations.filter(x => x.map === this.opened_map)
-            //         .reduce((accum, item) => {
-            //             if(! (item.place_id in accum) ){
-            //                 accum[item.place_id] = {games: new Set(), map: item.map, place: item.place, place_id: item.place_id};
-            //             }
-            //             let games_to_add = item.game in game_to_acro ? game_to_acro[item.game] : {text: item.game, id: "unknown"};
-            //             console.log(games_to_add)
-            //             games_to_add.forEach(game_to_add => accum[item.place_id].games.add(game_to_add));
-            //             return accum;
-            //         }, {})).sort((a,b)=>{
-            //             if (a.place.startsWith("Route") && b.place.startsWith("Route")){
-            //                 return +a.place.split(' ')[1] - +b.place.split(' ')[1]
-            //             } else if(a.place.startsWith("Route")){
-            //                 return 1;
-            //             } else if( b.place.startsWith("Route")){
-            //                 return -1;
-            //             }
-            //             else{
-            //                 if ( a.place < b.place ) return -1;
-            //                 if (a.place > b.place) return 1;
-            //                 else return 0;
-            //             }
-            //         });
-            //
-            //
-            //     console.log(ordered_locations)
-            //     img_td.append("img")
-            //         .attr("src", "data/pokemon_data/sprites/" + poke_dict[i] + ".png")
-            //         .attr("width", 100)
-            //         .attr("height", 100)
-            //         .style("object-fit", "contain")
-            //         .on("mouseover", () => this.highlight_pokemon_regions(ordered_locations))
-            //         .on("mouseout", () => this.unhighlight_pokemon_regions(ordered_locations))
-            //         // .attr("overflow", "hidden")
-            //     locs_td.append("div")
-            //         .text(this.loc_data[poke_dict[i]].name)
-            //     let row = locs_td.append("div")
-            //         .attr("style", "height:100px;overflow:auto")
-            //         .append("table")
-            //         .selectAll("tr")
-            //         .data(ordered_locations) // Eventually filter that to just locs in this game
-            //         .join("tr")
-            //         .on("mouseover", d => this.highlight_region(d))
-            //         .on("mouseout", d => this.unhighlight_region(d));
-            //     row.append("td")
-            //         .text(d =>d.place);
-            //     row.each((function(d){
-            //             let cell = d3.select(this).append("td");
-            //             d.games.forEach((x) => {
-            //                 console.log(x.text)
-            //                 cell.append("span")
-            //                     .classed( x.id, true)
-            //                     .classed("game_title", true)
-            //                     .attr("title", x.game)
-            //                     .text(x.text)
-            //             });
-            //         }))
-            //         // .selectAll("span")
-            //         // .data(d=> d.games)
-            //         // .join("span")
-            //         // .text(d=>d.text)
-            //         // .attr("id", d=> d.id)
-            // } else{
-            //     img_td.append("img")
-            //         .attr("src", "data/pokemon_data/sprites/whodat.png")
-            //         .attr("width", 100)
-            //     locs_td.append("div")
-            //         .text("Pokemon not selected.")
-            // }
-        // }
-
-
-    }
 }
