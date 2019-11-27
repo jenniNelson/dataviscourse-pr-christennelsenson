@@ -180,19 +180,23 @@ class MapView {
 
     open_map(which) {
         // Declare all variables
-        var i, tabcontent, tablinks;
+        let i, tabcontent, tablinks;
 
         // Get all elements with class="tabcontent" and hide them
-        tabcontent = document.getElementsByClassName("tabcontent");
-        for (i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].style.display = "none";
-        }
+        // tabcontent = document.getElementsByClassName("tabcontent");
+        // for (i = 0; i < tabcontent.length; i++) {
+        //     tabcontent[i].style.display = "none";
+        // }
+        tabcontent = d3.selectAll("#map_area .tabcontent")
+            .style("display", "none")
 
         // Get all elements with class="tablinks" and remove the class "active"
-        tablinks = document.getElementsByClassName("tablinks");
-        for (i = 0; i < tablinks.length; i++) {
-            tablinks[i].className = tablinks[i].className.replace(" active", "");
-        }
+        // tablinks = document.getElementsByClassName("tablinks");
+        // for (i = 0; i < tablinks.length; i++) {
+        //     tablinks[i].className = tablinks[i].className.replace(" active", "");
+        // }
+        tablinks = d3.selectAll("#map_area .tablinks")
+            .classed("active", false);
 
         // Show the current map, and add an "active" class to the button that opened the tab
         document.getElementById(which.map_id).style.display = "block";
