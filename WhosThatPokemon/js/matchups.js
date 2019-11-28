@@ -52,7 +52,7 @@ class Matchups{
     initialize_tabs() {
         let that = this;
         d3.selectAll("#view_switcher .tablinks").data(["vs", "team"])
-            .on("click", that.switch_tabs);
+            .on("click", d=>that.switch_tabs(d));
         console.log("heer");
         d3.select("#vs_button")
             .classed("active", true);
@@ -63,7 +63,7 @@ class Matchups{
             .classed("hidden", true);
         d3.selectAll("#view_switcher .tablinks")
             .classed("active", false);
-
+        console.log(this)
         console.log(name, this.current_view);
 
         if (name === "vs" && this.current_view !== "vs") {
