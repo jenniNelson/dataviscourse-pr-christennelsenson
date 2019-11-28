@@ -6,7 +6,7 @@ loadData().then(poke_dict => {
 
     let card_manager = new CardManager();
     let pokedex = new Pokedex(poke_dict, card_manager);
-    let matchupview = new Matchups(poke_dict);
+    let matchupview = new Matchups(poke_dict, card_manager);
     let mapview = new MapView(poke_dict, card_manager);
 
     card_manager.update_objects();
@@ -82,18 +82,18 @@ async function loadFile(file) {
 class CardManager{
     constructor() {
         this.vs = {
-            0: null,
-            1: null,
-            queue: []
+            0: '002',
+            1: '001',
+            queue: [0,1]
         };
         this.team = {
-            0: null,
-            1: null,
-            2: null,
-            3: null,
-            4: null,
-            5: null,
-            queue: []
+            0: '001',
+            1: '011',
+            2: '001',
+            3: '001',
+            4: '001',
+            5: '001',
+            queue: [0,1,2,3,4,5]
         };
 
         this.callbacks = []
