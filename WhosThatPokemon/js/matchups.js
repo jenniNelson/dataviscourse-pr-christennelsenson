@@ -115,7 +115,6 @@ class Matchups{
                 .attr("id", "vs_svg_" + j)
                 .attr("width", 430)
                 .attr("height", 225)
-                // .style("border", "1pt solid black")
 
         }
         for (let j = 0; j < this.num_team; j++) {
@@ -136,7 +135,6 @@ class Matchups{
                 .attr("id", "tb_svg_" + j)
                 .attr("width", 430)
                 .attr("height", 225)
-                // .style("border", "1pt solid black");
         }
     }
 
@@ -151,11 +149,11 @@ class Matchups{
             this.draw_card(this.card_manager.team[j], "#tb_svg_" + j)
         }
 
-        let pane = d3.select("#vs_" + '1');
-        pane.selectAll("select option")
-                .property("selected", d=>d.long_id === this.card_manager.vs[j])
-                .attr("value", d=>d.long_id)
-                .text( d => d.name + " (#" + d.long_id + ")");
+        // let pane = d3.select("#vs_" + '1');
+        // pane.selectAll("select option")
+        //         .property("selected", d=>d.long_id === this.card_manager.vs[j])
+        //         .attr("value", d=>d.long_id)
+        //         .text( d => d.name + " (#" + d.long_id + ")");
 
 
     }
@@ -272,7 +270,8 @@ class Matchups{
         info_group.append("text")
             .attr("x", 0)
             .attr("y", 13)
-            .text(((mon.type2 !== '') && (mon.type1 !== mon.type2) ?mon.type1 +' & '+ mon.type2 :mon.type1));
+            .text(((mon.type2 !== '') && (mon.type1 !== mon.type2) ?mon.type1 +' & '+ mon.type2 :mon.type1))
+            .style("font-size", "11pt");
 
 
         info_group.append("text")
