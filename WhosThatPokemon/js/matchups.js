@@ -100,9 +100,10 @@ class Matchups{
             let pane = d3.select("#vs_" + j);
 
             $("#vs_dd_"+j).select2().on("select2:select", function(evt) {
-                    let mon = d3.select(evt.params.data.element).datum();
-                    that.card_manager.vs[j] = mon.long_id
-                    that.draw_card(mon.long_id, "#vs_svg_" + j);
+                let mon = d3.select(evt.params.data.element).datum();
+                // that.card_manager.vs[j] = mon.long_id
+                // that.draw_card(mon.long_id, "#vs_svg_" + j);
+                that.card_manager.update_vs(j, mon.long_id)
             });
 
             pane.select("select")
@@ -122,9 +123,11 @@ class Matchups{
             let pane = d3.select("#tb_" + j);
 
             $("#tb_dd_"+j).select2().on("select2:select", function(evt) {
-                    let mon = d3.select(evt.params.data.element).datum();
-                    that.card_manager.team[j] = mon.long_id;
-                    that.draw_card(mon.long_id, "#tb_svg_" + j);
+                let mon = d3.select(evt.params.data.element).datum();
+                // that.card_manager.team[j] = mon.long_id;
+                // that.draw_card(mon.long_id, "#tb_svg_" + j);
+
+                that.card_manager.update_team(j, mon.long_id)
             });
 
             pane.select("select").selectAll("option").data(this.mons).join("option")
@@ -142,20 +145,24 @@ class Matchups{
 
     initialize_cards() {
         for (let j = 0; j<this.num_vs; j++) {
-            // this.draw_card(this.card_manager.vs[j], "#vs_svg_" + j)
-            console.log("HERE",this.card_manager.vs[j])
-            this.draw_card(this.card_manager.vs[j], "#vs_svg_" + j)
+            let mon = this.poke_dict[this.card_manager.vs[j]];
+            this.draw_card(this.card_manager.vs[j], "#vs_svg_" + j);
+            $("#vs_dd_"+j).val(mon.long_id);
+            $("#vs_dd_"+j).trigger("change");
         }
         for (let j = 0; j<this.num_team; j++) {
-            console.log("HERE",this.card_manager.team[j])
-            this.draw_card(this.card_manager.team[j], "#tb_svg_" + j)
+            let mon = this.poke_dict[this.card_manager.team[j]];
+            this.draw_card(this.card_manager.team[j], "#tb_svg_" + j);
+            $("#tb_dd_"+j).val(mon.long_id);
+            $("#tb_dd_"+j).trigger("change");
         }
 
-        let pane = d3.select("#vs_" + '1');
-        pane.selectAll("select option")
-                .property("selected", d=>d.long_id === this.card_manager.vs[j])
-                .attr("value", d=>d.long_id)
-                .text( d => d.name + " (#" + d.long_id + ")");
+        // let pane = d3.select("#vs_" + '1');
+        // pane.selectAll("select option")
+        //         .property("selected", d=>d.long_id === this.card_manager.vs[j])
+        //         .attr("value", d=>d.long_id)
+        //         .text( d => d.name + " (#" + d.long_id + ")");
+
 
 
     }
@@ -302,6 +309,8 @@ class Matchups{
         let prev_ev = mon.ev_from;
         let next_evs = mon.ev_to;
 
+        let [vs_or_tb, _, card_id] = svg_id.split('_');
+
         if (prev_ev) {
             let prev_group = pallet.append("g")
                 .attr("transform", "translate(130, 165)");
@@ -319,13 +328,15 @@ class Matchups{
                 .attr("r", 20)
                 .attr("fill", this.type_colors[mon.type1][1]);
 
+
             prev_group.append("image")
                 .attr("href", "data/pokemon_data/sprites/" + prev_ev + ".png")
                 .attr("x", -10)
                 .attr("y", 7)
                 .attr("width", 40)
                 .attr("height", 40)
-                .style("cursor", "pointer");
+                .style("cursor", "pointer")
+                .on("click", () => this.card_manager.update_pokemon(vs_or_tb, +card_id, prev_ev));
 
             prev_group.append("text")
                 .text(this.poke_dict[prev_ev].name)
@@ -354,14 +365,18 @@ class Matchups{
                 .attr("cy", 15)
                 .attr("r", 20)
                 .attr("fill", this.type_colors[mon.type1][1]);
-
+            let that=this
             groups.append("image")
-                .attr("href", d=> "data/pokemon_data/sprites/" + d + ".png")
+                .attr("href", d => "data/pokemon_data/sprites/" + d + ".png")
                 .attr("x", 0)
                 .attr("y", -3)
                 .attr("height", 40)
                 .attr("width", 40)
-                .style("cursor", "pointer");
+                .style("cursor", "pointer")
+                .each( function(d){
+                    d3.select(this)
+                        .on("click", () => that.card_manager.update_pokemon(vs_or_tb, +card_id, d))
+                })
 
             groups.append("text")
                 .text(d=> this.poke_dict[d].name)
