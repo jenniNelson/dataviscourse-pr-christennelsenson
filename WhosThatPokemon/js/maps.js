@@ -17,7 +17,7 @@ type_colors = {
             "normal" : ["#f2ffb8","#9b996d"],
             "fighting" : ["#ff9a78","#9b532f"],
             "electric" : ["#ffff56","#c8c24a"],
-            "missing" : ["#242424", "#0c0c0c"]
+            "missing" : ["#505050", "#0c0c0c"]
         };
 
 game_to_acro = {
@@ -261,7 +261,7 @@ class MapView {
                     accum[item.place_id] = {games: new Set(), map: item.map, place: item.place, place_id: item.place_id};
                 }
                 let games_to_add = item.game in game_to_acro ? game_to_acro[item.game] : {text: item.game, id: "unknown"};
-                console.log(games_to_add)
+                // console.log(games_to_add)
                 games_to_add.forEach(game_to_add => accum[item.place_id].games.add(game_to_add));
                 return accum;
             }, {})).sort(location_sort);

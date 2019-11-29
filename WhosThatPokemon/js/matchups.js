@@ -2,17 +2,19 @@ class Matchups{
     constructor(pokemon, card_manager) {
 
         let that = this;
-        function update_pokemon(){
-            that.initialize_cards();
+        function update_pokemon(cat, pos, mon){
+            if(pos !== undefined && mon !== undefined){
+                console.log(cat, pos, mon);
+                that.update_card(cat, pos, mon);
+            }
+            // that.initialize_cards();
         }
         this.card_manager = card_manager;
         this.card_manager.add_callback(update_pokemon);
 
         this.poke_dict = pokemon;
         this.mons = Object.values(pokemon).sort((a,b)=>+a.long_id - +b.long_id);
-
-        // this.vs_selection = ['001', '133'];
-        // this.team_selection = ['003', '242', '321', '500', '292', '141'];
+        this.mons.push(missingno);
 
         this.current_view = "vs";
 
@@ -38,7 +40,7 @@ class Matchups{
             "normal" : ["#f2ffb8","#9b996d"],
             "fighting" : ["#ff9a78","#9b532f"],
             "electric" : ["#ffff56","#c8c24a"],
-            "missing" : ["#242424", "#0c0c0c"]
+            "missing" : ["#505050", "#0c0c0c"]
         };
 
         this.stat_bar_colors = [
@@ -72,13 +74,13 @@ class Matchups{
             .classed("hidden", true);
         d3.selectAll("#view_switcher .tablinks")
             .classed("active", false);
-        console.log(this)
-        console.log(name, this.current_view);
 
         if (name === "vs" && this.current_view !== "vs") {
             d3.select("#vs_button")
                 .classed("active", true);
             d3.select("#vs_table")
+                .classed("hidden", false);
+            d3.select("#matchup_summary")
                 .classed("hidden", false);
             this.current_view = "vs"
         } else if (name === "team" && this.current_view !== "team") {
@@ -86,11 +88,10 @@ class Matchups{
                 .classed("active", true);
             d3.select("#team_build_table")
                 .classed("hidden", false);
+            d3.select("#team_summary")
+                .classed("hidden", false);
             this.current_view = "team"
         }
-
-        console.log("Clicked", this.current_view)
-
 
     }
 
@@ -100,16 +101,17 @@ class Matchups{
             let pane = d3.select("#vs_" + j);
 
             $("#vs_dd_"+j).select2().on("select2:select", function(evt) {
-                    let mon = d3.select(evt.params.data.element).datum();
-                    that.card_manager.vs[j] = mon.long_id
-                    that.draw_card(mon.long_id, "#vs_svg_" + j);
+                let mon = d3.select(evt.params.data.element).datum();
+                // that.card_manager.vs[j] = mon.long_id
+                // that.draw_card(mon.long_id, "#vs_svg_" + j);
+                that.card_manager.update_vs(j, mon.long_id)
             });
 
             pane.select("select")
                 .selectAll("option").data(this.mons).join("option")
                 .property("selected", d=>d.long_id === this.card_manager.vs[j])
                 .attr("value", d=>d.long_id)
-                .text( d => d.name + " (#" + d.long_id + ")");
+                .text( d => ((d.long_id === "whodat")?"(No Selection)":d.name + " (#" + d.long_id + ")"));
 
             pane.append("svg")
                 .attr("id", "vs_svg_" + j)
@@ -121,9 +123,11 @@ class Matchups{
             let pane = d3.select("#tb_" + j);
 
             $("#tb_dd_"+j).select2().on("select2:select", function(evt) {
-                    let mon = d3.select(evt.params.data.element).datum();
-                    that.card_manager.team[j] = mon.long_id;
-                    that.draw_card(mon.long_id, "#tb_svg_" + j);
+                let mon = d3.select(evt.params.data.element).datum();
+                // that.card_manager.team[j] = mon.long_id;
+                // that.draw_card(mon.long_id, "#tb_svg_" + j);
+
+                that.card_manager.update_team(j, mon.long_id)
             });
 
             pane.select("select").selectAll("option").data(this.mons).join("option")
@@ -140,22 +144,17 @@ class Matchups{
 
     initialize_cards() {
         for (let j = 0; j<this.num_vs; j++) {
-            // this.draw_card(this.card_manager.vs[j], "#vs_svg_" + j)
-            console.log("HERE",this.card_manager.vs[j])
-            this.draw_card(this.card_manager.vs[j], "#vs_svg_" + j)
+            let mon = this.poke_dict[this.card_manager.vs[j]];
+            this.draw_card(this.card_manager.vs[j], "#vs_svg_" + j);
+            $("#vs_dd_"+j).val(mon.long_id)
+                .trigger("change");
         }
         for (let j = 0; j<this.num_team; j++) {
-            console.log("HERE",this.card_manager.team[j])
-            this.draw_card(this.card_manager.team[j], "#tb_svg_" + j)
+            let mon = this.poke_dict[this.card_manager.team[j]];
+            this.draw_card(this.card_manager.team[j], "#tb_svg_" + j);
+            $("#tb_dd_"+j).val(mon.long_id)
+                .trigger("change");
         }
-
-        // let pane = d3.select("#vs_" + '1');
-        // pane.selectAll("select option")
-        //         .property("selected", d=>d.long_id === this.card_manager.vs[j])
-        //         .attr("value", d=>d.long_id)
-        //         .text( d => d.name + " (#" + d.long_id + ")");
-
-
     }
 
     toggle_view() {
@@ -168,28 +167,24 @@ class Matchups{
         }
     }
 
+    update_card(cat, pos, mon_id) {
+        let dd_id = ((cat==="vs")?"#vs_dd_":"#tb_dd_") + pos;
+        let svg_id = ((cat==="vs")?"#vs_svg_":"#tb_svg_") + pos;
+
+        console.log(svg_id);
+
+        $(dd_id).val(mon_id).trigger("change");
+        this.draw_card(mon_id, svg_id)
+    }
+
     draw_card(id, svg_id) {
 
         let stat_labels = ["hp","atk","def","s.a.", "s.d.", "spd"];
         d3.select(svg_id).select("g").remove();
         let pallet = d3.select(svg_id).append("g");
         let mon;
-        if (id === null){
-            mon = {
-                type1 : "missing",
-                long_id : "whodat",
-                hp: 0,
-                attack: 0,
-                defense: 0,
-                sp_attack: 0,
-                sp_defense: 0,
-                speed: 0,
-                stat_total: 0,
-                height_m: "?",
-                weight_kg: "?",
-                ev_from : [],
-                ev_to : []
-            }
+        if (id === "whodat"){
+            mon = missingno;
         } else{
             mon = this.poke_dict[id];
         }
@@ -301,6 +296,8 @@ class Matchups{
         let prev_ev = mon.ev_from;
         let next_evs = mon.ev_to;
 
+        let [vs_or_tb, _, card_id] = svg_id.split('_');
+
         if (prev_ev) {
             let prev_group = pallet.append("g")
                 .attr("transform", "translate(130, 165)");
@@ -318,13 +315,15 @@ class Matchups{
                 .attr("r", 20)
                 .attr("fill", this.type_colors[mon.type1][1]);
 
+
             prev_group.append("image")
                 .attr("href", "data/pokemon_data/sprites/" + prev_ev + ".png")
                 .attr("x", -10)
                 .attr("y", 7)
                 .attr("width", 40)
                 .attr("height", 40)
-                .style("cursor", "pointer");
+                .style("cursor", "pointer")
+                .on("click", () => this.card_manager.update_pokemon(vs_or_tb, +card_id, prev_ev));
 
             prev_group.append("text")
                 .text(this.poke_dict[prev_ev].name)
@@ -353,14 +352,18 @@ class Matchups{
                 .attr("cy", 15)
                 .attr("r", 20)
                 .attr("fill", this.type_colors[mon.type1][1]);
-
+            let that=this;
             groups.append("image")
-                .attr("href", d=> "data/pokemon_data/sprites/" + d + ".png")
+                .attr("href", d => "data/pokemon_data/sprites/" + d + ".png")
                 .attr("x", 0)
                 .attr("y", -3)
                 .attr("height", 40)
                 .attr("width", 40)
-                .style("cursor", "pointer");
+                .style("cursor", "pointer")
+                .each( function(d){
+                    d3.select(this)
+                        .on("click", () => that.card_manager.update_pokemon(vs_or_tb, +card_id, d))
+                });
 
             groups.append("text")
                 .text(d=> this.poke_dict[d].name)
@@ -451,4 +454,22 @@ let defense_map = {
     .5: 1,
     .25: 2,
     0: 2
+};
+
+let missingno = {
+                name: "(no selection)",
+                type1 : "missing",
+                type2 : "",
+                long_id : "whodat",
+                hp: 0,
+                attack: 0,
+                defense: 0,
+                sp_attack: 0,
+                sp_defense: 0,
+                speed: 0,
+                stat_total: 0,
+                height_m: "?",
+                weight_kg: "?",
+                ev_from : "",
+                ev_to : []
 };
