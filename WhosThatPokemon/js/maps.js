@@ -17,7 +17,7 @@ type_colors = {
             "normal" : ["#f2ffb8","#9b996d"],
             "fighting" : ["#ff9a78","#9b532f"],
             "electric" : ["#ffff56","#c8c24a"],
-            "missing" : ["#242424", "#0c0c0c"]
+            "missing" : ["#505050", "#0c0c0c"]
         };
 
 game_to_acro = {

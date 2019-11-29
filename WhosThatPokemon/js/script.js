@@ -82,17 +82,17 @@ async function loadFile(file) {
 class CardManager{
     constructor() {
         this.vs = {
-            0: '002',
-            1: '001',
+            0: '001',
+            1: '133',
             queue: [0,1]
         };
         this.team = {
-            0: '001',
-            1: '011',
-            2: '001',
-            3: '001',
-            4: '001',
-            5: '001',
+            0: '003',
+            1: '320',
+            2: '412',
+            3: '231',
+            4: '600',
+            5: '165',
             queue: [0,1,2,3,4,5]
         };
 
@@ -131,14 +131,15 @@ class CardManager{
                     this.team[i] = to_who;
                     this.team.queue.push(i);
                     none_free = false;
+                    which_card=i;
                     break;
                 }
             }
             if (none_free) {
-                let one_to_displace = this.team.queue.shift();
-                one_to_displace = one_to_displace === undefined ? 0 : one_to_displace;
-                this.team[one_to_displace] = to_who;
-                this.team.queue.push(one_to_displace);
+                which_card = this.team.queue.shift();
+                which_card = which_card === undefined ? 0 : which_card;
+                this.team[which_card] = to_who;
+                this.team.queue.push(which_card);
             }
         } else if(checkbox === false){
             for (let i of [0,1,2,3,4,5]){
@@ -149,12 +150,18 @@ class CardManager{
                     if (index > -1) {
                       this.team.queue.splice(index, 1);
                     }
+                    which_card = i;
+                    to_who = null;
                     break;
                 }
             }
         }
 
-        this.update_objects()
+        if(to_who === null) {
+            to_who = "whodat"
+        }
+
+        this.update_objects("team", which_card, to_who)
     }
 
     update_vs(which_card, to_who, checkbox=null){
@@ -176,14 +183,15 @@ class CardManager{
                     this.vs[i] = to_who;
                     this.vs.queue.push(i);
                     none_free = false;
+                    which_card=i;
                     break;
                 }
             }
             if (none_free) {
-                let one_to_displace = this.vs.queue.shift();
-                one_to_displace = one_to_displace === undefined ? 0 : one_to_displace;
-                this.vs[one_to_displace] = to_who;
-                this.vs.queue.push(one_to_displace);
+                which_card = this.vs.queue.shift();
+                which_card = which_card === undefined ? 0 : which_card;
+                this.vs[which_card] = to_who;
+                this.vs.queue.push(which_card);
             }
         } else if(checkbox === false){
             for (let i of [0,1]){
@@ -194,20 +202,27 @@ class CardManager{
                     if (index > -1) {
                       this.vs.queue.splice(index, 1);
                     }
+                    which_card = i;
+                    to_who = null;
                     break;
                 }
             }
         }
 
-        this.update_objects()
+        if(to_who === null) {
+            to_who = "whodat"
+        }
+
+        this.update_objects("vs", which_card, to_who)
     }
 
-    update_objects(){
+    update_objects(cat, which_card, to_who){
 
         // console.log(this.team, this.vs, this.callbacks)
+        console.log("YOOHOO", which_card)
 
         for (let cb of this.callbacks){
-            cb();
+            cb(cat, which_card, to_who);
         }
 
     }
