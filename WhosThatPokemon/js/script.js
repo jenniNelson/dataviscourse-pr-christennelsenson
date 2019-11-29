@@ -250,7 +250,7 @@ class Pokemon{
                     game: game,
                     map: map,
                     place: place,
-                    place_id : place.replace(' ', '_').replace('.', '')
+                    place_id : place.replace(/ /g, '_').replace(/\.|'/g, '')
                 };
         }); //list of location strings
     }

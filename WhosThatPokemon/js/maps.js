@@ -77,22 +77,31 @@ class MapView {
     constructor(loc_data, card_manager){
 
         let that = this;
-        function update_pokemon()
-        {
-            for (let i of [0, 1, 2, 3, 4, 5]) {
-                let spot = d3.select('#map_poke_' + i);
-                let the_poke = that.loc_data[that.card_manager.team[i]];
-                that.make_location_card(spot, the_poke);
-            }
-        }
+        // function update_pokemon()
+        // {
+        //     MapView.redraw_cards(that);
+        //     // for (let i of [0, 1, 2, 3, 4, 5]) {
+        //     //     let spot = d3.select('#map_poke_' + i);
+        //     //     let the_poke = that.loc_data[that.card_manager.team[i]];
+        //     //     that.make_location_card(spot, the_poke);
+        //     // }
+        // }
         this.card_manager = card_manager;
-        this.card_manager.add_callback(update_pokemon);
+        this.card_manager.add_callback(() => MapView.redraw_cards(that));
 
         this.loc_data = loc_data;
         this.opened_map = undefined;
 
         this.initialize_maps_and_tabs()
 
+    }
+
+    static redraw_cards(that){
+        for (let i of [0, 1, 2, 3, 4, 5]) {
+            let spot = d3.select('#map_poke_' + i);
+            let the_poke = that.loc_data[that.card_manager.team[i]];
+            that.make_location_card(spot, the_poke);
+        }
     }
 
     initialize_maps_and_tabs(){
@@ -148,7 +157,7 @@ class MapView {
             .join("button")
             .classed("tablinks", true)
             .attr("id", d=>d.tab_id)
-            .on("click", this.open_map)
+            .on("click", (d) => this.open_map(d))
             .text(d => d.text);
 
         d3.select("#map_area>#the_maps").selectAll("div.tabcontent")
@@ -203,10 +212,11 @@ class MapView {
         // evt.currentTarget.className += " active";
         d3.select("#"+which.tab_id).classed("active", true)
         this.opened_map = which.map_id;
+        MapView.redraw_cards(this)
+
     }
 
     highlight_region(d){
-
         let the_region = d3.select("#"+d.map).select("#"+d.place_id)
         the_region.classed("highlighted_region", true);
 
@@ -220,7 +230,6 @@ class MapView {
     }
 
     highlight_pokemon_regions(places){
-
         for (let place of places){
             this.highlight_region(place)
         }
@@ -293,9 +302,10 @@ class MapView {
                 .data(ordered_locations)
                 .join("tr")
                 .on("mouseover", d => this.highlight_region(d))
-                .on("mouseout", d => this.unhighlight_region(d));
+                .on("mouseout", d => this.unhighlight_region(d))
             row.append("td")
-                .text(d =>d.place);
+                .text(d =>d.place)
+                .attr("title", d=> Array.from(d.games).reduce( (str, x)=> str + x.game + ", ", "").slice(0,-2));
 
 
         } else {
