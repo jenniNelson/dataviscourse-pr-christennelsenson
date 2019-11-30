@@ -3,9 +3,10 @@ class Matchups{
 
         let that = this;
         function update_pokemon(cat, pos, mon){
-            if(pos !== undefined && mon !== undefined){
+            if(mon !== undefined){
                 console.log(cat, pos, mon);
                 that.update_card(cat, pos, mon);
+                that.update_summary(cat);
             }
             // that.initialize_cards();
         }
@@ -55,9 +56,12 @@ class Matchups{
         this.stat_scale =d3.scaleLinear().domain([0,250]).range([0,250]);
         this.stat_axis = d3.axisBottom(this.stat_scale).tickSize(100).ticks(5);
 
+        this.hp_bar_scale = d3.scaleLinear().domain([0,1]).range([0,300]);
+
         this.initialize_tabs();
         this.fill_dropdowns();
         this.initialize_cards();
+        this.initialize_summaries();
     }
 
     initialize_tabs() {
@@ -157,16 +161,6 @@ class Matchups{
         }
     }
 
-    toggle_view() {
-        if (this.current_view === 'vs') {
-
-        } else if (this.current_view === 'team') {
-
-        } else {
-
-        }
-    }
-
     update_card(cat, pos, mon_id) {
         let dd_id = ((cat==="vs")?"#vs_dd_":"#tb_dd_") + pos;
         let svg_id = ((cat==="vs")?"#vs_svg_":"#tb_svg_") + pos;
@@ -174,7 +168,7 @@ class Matchups{
         console.log(svg_id);
 
         $(dd_id).val(mon_id).trigger("change");
-        this.draw_card(mon_id, svg_id)
+        this.draw_card(mon_id, svg_id);
     }
 
     draw_card(id, svg_id) {
@@ -373,9 +367,186 @@ class Matchups{
                 .style("font-size", "8pt")
         }
     }
+
+    initialize_summaries() {
+
+        d3.select("#matchup_summary").append("svg")
+            .attr("height", 500)
+            .attr("width", 900)
+            .attr("id", "vs_sum_svg");
+
+        d3.select("#team_summary").append("svg")
+            .attr("height", 500)
+            .attr("width", 900)
+            .attr("id", "tb_sum_svg");
+
+        this.draw_vs_summary();
+
+        this.draw_team_summary();
+    }
+
+
+    update_summary(category) {
+        if (category === "vs") {
+            this.draw_vs_summary();
+        } else {
+            this.draw_team_summary();
+        }
+
+    }
+
+    draw_vs_summary() {
+
+        let mons =[];
+        for(let i =0; i < 2; i++) {
+            if(this.card_manager.vs[i] !== null) {
+                mons.push(this.poke_dict[this.card_manager.vs[i]])
+            }
+        }
+        console.log(mons)
+
+        d3.select("#vs_sum_svg").select("g").remove();
+        let pallet = d3.select("#vs_sum_svg").append("g")
+
+        let background = pallet.append("g").attr("transform", "translate(5,5)")
+
+        if(mons.length === 2) {
+            background.append("rect")
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", 890)
+                .attr("height", 490)
+                .attr("fill", "#b7b7b7")
+                .attr("rx", 10);
+            background.append("text")
+                .attr("x", 445)
+                .attr("y", 20)
+                .attr("text-anchor", "middle")
+                .text("MATCHUP SUMMARY")
+                .style("font-weight", "bold")
+                .style("font-size", "14pt")
+                .style("text-decoration", "underline");
+
+            let pow_pow = 90;
+            let lvl = 50;
+
+            let left_hp = hp_stat(mons[0], lvl);
+            let right_hp = hp_stat(mons[1], lvl);
+
+
+
+            let left_ph_damage = damage(mons[1],mons[0],false, lvl, pow_pow);
+            let left_sp_damage = damage(mons[1],mons[0],true, lvl, pow_pow);
+            let right_ph_damage = damage(mons[0],mons[1],false, lvl, pow_pow);
+            let right_sp_damage = damage(mons[0],mons[1],true, lvl, pow_pow);
+
+            let left_ph_perc = Math.max((left_hp - left_ph_damage)/left_hp,0);
+            let left_sp_perc = Math.max((left_hp - left_sp_damage)/left_hp,0);
+            let right_ph_perc = Math.max((right_hp - right_ph_damage)/right_hp,0);
+            let right_sp_perc = Math.max((right_hp - right_sp_damage)/right_hp,0);
+
+            console.log(mons[1].name, "does",left_ph_damage, "physical damage to", left_hp, ":", left_ph_perc);
+            console.log(mons[1].name, "does",left_sp_damage, "special damage to", left_hp, ":", left_sp_perc);
+            console.log(mons[0].name, "does",right_ph_damage, "physical damage to", right_hp, ":", right_ph_perc);
+            console.log(mons[0].name, "does",right_sp_damage, "special damage to", right_hp, ":", right_sp_perc);
+
+
+            let hp_bar_group = background.append("g").attr("transform", "translate(445, 60)")
+
+            hp_bar_group.append("line").attr("x1", 0).attr("y1", 0).attr("x2", 0).attr("y2", 110)
+                .style("stroke", "gray").style("stroke-width", 3);
+
+            this.draw_hp_bar(hp_bar_group, left_ph_perc, -400, 10, true, mons[0]);
+            this.draw_hp_bar(hp_bar_group, left_sp_perc, -400, 80, false,mons[0]);
+            this.draw_hp_bar(hp_bar_group, right_ph_perc, 100, 10, true, mons[1]);
+            this.draw_hp_bar(hp_bar_group, right_sp_perc, 100, 80, false,mons[1]);
+
+        } else {
+            // TODO
+        }
+    }
+
+    draw_hp_bar(group, percentage, x, y, is_phys, mon) {
+        let base = group.append("g").attr("transform", "translate(" + x +","+y+")");
+        base.append("rect").attr("x", 0).attr("y", 0).attr("width", 300).attr("height", 20)
+            .attr("stroke", "black").attr("stroke-width", 3).attr("fill", "#ffffff");
+        base.append("rect").attr("x", 0).attr("y", 0).attr("width", this.hp_bar_scale(percentage)).attr("height", 20)
+            .attr("fill", "#11a100");
+        base.append("rect").attr("x", this.hp_bar_scale(percentage)).attr("y", 0).attr("width", this.hp_bar_scale(1-percentage)).attr("height", 20)
+            .attr("fill", "#dd0001");
+        base.append("text").attr("x", -6).attr("y", -8)
+            .text("HP after " + (is_phys?"physical":"special") + " attack:")
+        base.append("text").attr("x", 8).attr("y", 15)
+            .text("" + Math.floor(percentage*100) + "%")
+
+    }
+
+    draw_team_summary() {
+        let mons = []
+        for(let i =0; i < 2; i++) {
+            mons.push(this.poke_dict[this.card_manager.team[i]])
+        }
+        let pallet = d3.select("#team_summary").append("svg")
+    }
+
+
 }
 
-types_to_idx = {
+function hp_stat(mon, level) {
+    console.log(mon);
+    return Math.floor((2*mon.hp + 15)*level/100) + level + 10
+}
+
+function damage(attack_mon, receive_mon, is_special, level, power) {
+    // return Math.floor(
+    //     Math.floor(
+    //     Math.floor((Math.floor(2*level/5) + 2)
+    //                     *power*Math.floor(is_special?attack_mon.sp_attack/receive_mon.sp_defense:attack_mon.attack/receive_mon.defense)
+    //                     /50
+    //     ) + 2)
+    //     *type_modifier(attack_mon, receive_mon)
+    // )
+
+    let topleft = 2*level/5 + 2;
+    let ratio = is_special?(attack_mon.sp_attack/receive_mon.sp_defense): (attack_mon.attack/receive_mon.defense);
+    let modifier = type_modifier(attack_mon, receive_mon);
+    console.log(topleft, "|", ratio, "|", modifier);
+    return Math.floor((Math.floor(topleft*power*ratio/50) + 2)*modifier)
+
+
+}
+
+function type_modifier(attacker, defender) {
+    let atk_1 = types_to_idx[attacker.type1];
+    let def_1 = types_to_idx[defender.type1];
+
+    if(attacker.type2 !== '') {
+        let atk_2 = types_to_idx[attacker.type2];
+
+        if(defender.type2 !== '') {
+            let def_2 = types_to_idx[defender.type2];
+            return Math.max(
+                matchups[atk_1][def_1]*matchups[atk_1][def_2],
+                matchups[atk_2][def_1]*matchups[atk_2][def_2]
+            )
+        } else {
+            return Math.max(
+                matchups[atk_1][def_1],
+                matchups[atk_2][def_1]
+            )
+        }
+    } else {
+        if(defender.type2 !== '') {
+            let def_2 = types_to_idx[defender.type2];
+            return matchups[atk_1][def_1]*matchups[atk_1][def_2]
+        } else {
+            return matchups[atk_1][def_1]
+        }
+    }
+}
+
+
+let types_to_idx = {
     "normal":0,
     "fire":1,
     "water":2,
@@ -437,24 +608,6 @@ let matchups = [
     [1, .5, .5, 1, .5, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, .5, 2],
     [1, .5, 1, 1, 1, 1, 2, .5, 1, 1, 1, 1, 1, 1, 2, 2, .5, 1]
 ];
-
-let offense_map = {
-    1: 0,
-    2: 1,
-    4: 2,
-    .5: -1,
-    .25: -2,
-    0: -2
-};
-
-let defense_map = {
-    1: 0,
-    2: -1,
-    4: -2,
-    .5: 1,
-    .25: 2,
-    0: 2
-};
 
 let missingno = {
                 name: "(no selection)",
