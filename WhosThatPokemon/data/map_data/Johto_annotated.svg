@@ -7,8 +7,7 @@
   <!--<rect fill="#fff" id="canvas_background" height="122" width="146" y="-1" x="-1"/>-->
  <!--</g>-->
  <g>
-  <title>Layer 1</title>
-  <image y="0" href="data/map_data/Johto.png" id="svg_1" height="120" width="144" x="0"/>
+  <image y="0" href="data/map_data/Johto.png" height="120" width="144" x="0"/>
   <rect class="map_place" id="Route_36" height="8.28877" width="24.331551" y="40.080213" x="47.802138"/>
   <rect class="map_place" id="Route_29" height="8.28877" width="31.550804" y="79.919785" x="95.93048"/>
   <rect class="map_place" id="Route_38" height="8.28877" width="23.529413" y="24.037432" x="32.026737"/>
