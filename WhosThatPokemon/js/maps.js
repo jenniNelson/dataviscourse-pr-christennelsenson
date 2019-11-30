@@ -141,13 +141,13 @@ class MapView {
                 text: "Unova",
                 image: "data/map_data/Unova_annotated.svg"
             }
-            // ,
-            // kalos: {
-            //     tab_id: "kalos_button",
-            //     map_id: "kalos",
-            //     text: "Kalos",
-            //     image: "data/map_data/Kalos.png"
-            // }
+            ,
+            kalos: {
+                tab_id: "kalos_button",
+                map_id: "kalos",
+                text: "Kalos",
+                image: "data/map_data/Kalos_annotated.svg"
+            }
             // ,
             // alola: {
             //     tab_id: "alola_button",

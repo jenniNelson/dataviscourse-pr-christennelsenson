@@ -54,7 +54,7 @@ table.sortable thead {
 .map_place {
     opacity: 0;
 }
-.highlighted_region {
+.highlighted_region, g.highlighted_region>* {
     fill: #ff2f00;
     opacity: .8;
 }
