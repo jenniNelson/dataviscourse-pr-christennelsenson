@@ -120,31 +120,35 @@ class MapView {
                 text: "Johto",
                 image: "data/map_data/Johto_annotated.svg"
             }
+            ,
+            hoenn: {
+                tab_id: "hoenn_button",
+                map_id: "hoenn",
+                text: "Hoenn",
+                image: "data/map_data/Hoenn_annotated.svg"
+            }
+            ,
+            sinnoh: {
+                tab_id: "sinnoh_button",
+                map_id: "sinnoh",
+                text: "Sinnoh",
+                image: "data/map_data/Sinnoh_annotated.svg"
+            }
+            ,
+            unova: {
+                tab_id: "unova_button",
+                map_id: "unova",
+                text: "Unova",
+                image: "data/map_data/Unova_annotated.svg"
+            }
             // ,
-            // hoenn: {
-            //     tab_id: "hoenn_button",
-            //     map_id: "hoenn",
-            //     text: "Hoenn",
-            //     image: "data/map_data/Hoenn.png"
-            // },
-            // sinnoh: {
-            //     tab_id: "sinnoh_button",
-            //     map_id: "sinnoh",
-            //     text: "Sinnoh",
-            //     image: "data/map_data/Sinnoh.png"
-            // },
-            // unova: {
-            //     tab_id: "unova_button",
-            //     map_id: "unova",
-            //     text: "Unova",
-            //     image: "data/map_data/Unova_2.png"
-            // },
             // kalos: {
             //     tab_id: "kalos_button",
             //     map_id: "kalos",
             //     text: "Kalos",
             //     image: "data/map_data/Kalos.png"
-            // },
+            // }
+            // ,
             // alola: {
             //     tab_id: "alola_button",
             //     map_id: "alola",
@@ -270,7 +274,7 @@ class MapView {
                     accum[item.place_id] = {games: new Set(), map: item.map, place: item.place, place_id: item.place_id};
                 }
                 let games_to_add = item.game in game_to_acro ? game_to_acro[item.game] : {text: item.game, id: "unknown"};
-                // console.log(games_to_add)
+                // console.log(games_to_add, item)
                 games_to_add.forEach(game_to_add => accum[item.place_id].games.add(game_to_add));
                 return accum;
             }, {})).sort(location_sort);

@@ -262,10 +262,10 @@ class Pokemon{
         this.locations = raw_locs.map( loc_string => {
             let [game,map,place] = loc_string.split('/')
                 return {
-                    game: game,
-                    map: map,
-                    place: place,
-                    place_id : place.replace(/ /g, '_').replace(/\.|'/g, '')
+                    game: game.replace(/\"/g, ""),
+                    map: map.replace(/\"/g, ""),
+                    place: place.replace(/\"/g, ""),
+                    place_id : place.replace(/\"/g, "").replace(/ /g, '_').replace(/\.|'/g, '')
                 };
         }); //list of location strings
     }

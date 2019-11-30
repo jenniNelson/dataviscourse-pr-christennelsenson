@@ -55,8 +55,8 @@ table.sortable thead {
     opacity: 0;
 }
 .highlighted_region {
-    fill: #ffad4b;
-    opacity: .5;
+    fill: #ff2f00;
+    opacity: .8;
 }
 
 
