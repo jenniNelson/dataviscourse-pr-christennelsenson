@@ -520,10 +520,10 @@ function type_modifier(attacker, defender) {
     let atk_1 = types_to_idx[attacker.type1];
     let def_1 = types_to_idx[defender.type1];
 
-    if(attacker.type2 !== '') {
+    if(attacker.type2 !== '' && attacker.type2 !== attacker.type1) {
         let atk_2 = types_to_idx[attacker.type2];
 
-        if(defender.type2 !== '') {
+        if(defender.type2 !== '' && defender.type2 !== defender.type1) {
             let def_2 = types_to_idx[defender.type2];
             return Math.max(
                 matchups[atk_1][def_1]*matchups[atk_1][def_2],
@@ -536,7 +536,7 @@ function type_modifier(attacker, defender) {
             )
         }
     } else {
-        if(defender.type2 !== '') {
+        if(defender.type2 !== '' && defender.type2 !== defender.type1) {
             let def_2 = types_to_idx[defender.type2];
             return matchups[atk_1][def_1]*matchups[atk_1][def_2]
         } else {
