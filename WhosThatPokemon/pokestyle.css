@@ -1,5 +1,5 @@
 body, button{
-    font-family: "Gill Sans", "sans-serif";
+    font-family: "Gill Sans", sans-serif;
 }
 
 thead,
@@ -10,6 +10,35 @@ tbody {
 tbody {
   height: 400px;
   overflow: auto;
+}
+
+ul.top_matter {
+    background-color: #bfbfbf;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    width: 1800px;
+}
+
+.top_matter li {
+  display: inline-block;
+  text-align: center;
+  padding: 3px 13px;
+  text-decoration: none;
+}
+
+.title {
+    background-color: #6d6e6e;
+    color: white;
+}
+
+.authors {
+
+}
+
+.emails {
+
 }
 
 #pokedex td {
