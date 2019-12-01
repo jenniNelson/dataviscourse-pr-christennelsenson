@@ -201,6 +201,11 @@ class FancyDex {
             return sumb-suma;
         }
 
+        // let stat_filter = function(MAX, headerValue, rowValue, rowData, filterParams){
+        //     console.log(MAX, headerValue, rowValue)
+        //     return headerValue*100/MAX >= rowValue
+        // }
+
         this.fancydex = new Tabulator("#fancydex", {
             height: 600,
             index:"long_id",
@@ -232,21 +237,463 @@ class FancyDex {
                 ,
                 {title:"Spd", field:"perc_speed", align:"left", width:75, formatter:"progress", formatterParams:{color:stat_bar_colors[5], legend:(x)=>"&nbsp;&nbsp;"+(x*this.max_speed/100).toFixed(0), legendAlign:'left'}}
                 ,
-                {title:"Type1", field:"type1", width:75, formatter:type_formatter}
+                {title:"T1", field:"type1", width:57, formatter:type_formatter}
                 ,
-                {title:"Type2", field:"type2", width:75, formatter:type_formatter}
+                {title:"T2", field:"type2", width:57, formatter:type_formatter}
                 ,
                 {title:"Gen", field:"gen_introduced", align:'center'}
             ]
         });
 
-        let table_controls = d3.select("#table_controls")
-        let fairydiv = table_controls.append("div")
-        fairydiv.append("img")
-            .attr("src","data/pokemon_data/typelabels/fairy.gif")
-            .attr("width", 50)
-        fairydiv.append("button")
-            .text("x")
+        let filtered_types = [];
+        let type_filters = function(data, filterParams){
+            if(filtered_types.length === 0){
+                return true
+            }
+            let in_something = filtered_types.includes(data.type1) || filtered_types.includes(data.type2)
+            // console.log(in_something)
+            return in_something
+        }
+
+
+        let filter_type = function(type){
+            console.log("Filter",type)
+            d3.select("#filter_"+type)
+                .classed("filter_select", true)
+            if(! filtered_types.includes(type)){
+                filtered_types.push(type)
+            }
+            console.log("Filtering", filtered_types)
+            that.fancydex.addFilter(type_filters)
+        }
+        let clear_type_filter = function(type){
+
+            console.log("Clear filter",type)
+            d3.select("#filter_"+type)
+                .classed("filter_select", false)
+            let index = filtered_types.indexOf(type);
+            if (index !== -1) filtered_types.splice(index, 1);
+            console.log("Filtering", filtered_types)
+            if(filtered_types.length ===0){
+                that.fancydex.removeFilter(type_filters)
+            } else{
+                // Refresh the data to make it re-filter
+                that.fancydex.setData(that.pokemon)
+            }
+        }
+        let clear_type_filters = function(){
+            console.log("Clear type filters")
+            d3.selectAll(".type_filter")
+                .classed("filter_select", false)
+            filtered_types = [];
+            that.fancydex.removeFilter(type_filters)
+        }
+
+
+
+        let table_controls = d3.select("#table_controls").append("table")
+        let row1 = table_controls.append("tr")
+        let row2 = table_controls.append("tr")
+        let row3 = table_controls.append("tr")
+
+        let row1_types = ["bug", "dark", "dragon", "electric", "fairy", "fighting"]
+        let row2_types = ["fire", "flying", "ghost", "grass", "ground", "ice"]
+        let row3_types = [ "normal", "poison", "psychic", "rock", "steel", "water"]
+
+        // let typebox = row1.selectAll("td").data(row1_types).join("td")
+        // typebox.append("img")
+        //     .attr("src",d => "data/pokemon_data/typelabels/"+ d + ".gif")
+        //     .attr("width", 50)
+        // typebox.append("td").append("button")
+        //     .text("x")
+        //     // .attr("style", "display:inline-block")
+        for (let [row, types] of [[row1,row1_types],[row2,row2_types],[row3,row3_types]]){
+            for (let type of types){
+                let svg = row.append("td").append("svg").classed("filter_button", true)
+                    .attr("id", "filter_"+type)
+                    .classed("type_filter", true)
+                    .attr("width", 75)
+                    .attr("height", 20)
+                svg.append("rect")
+                    .attr("width", "100%")
+                    .attr("height", "100%")
+                    .attr("rx", 7)
+                    .classed("svg_background", true);
+                svg.append("image")
+                    .attr("href","data/pokemon_data/typelabels/"+ type + ".gif")
+                    .attr("width", 50)
+                    .on("click", ()=> filter_type(type))
+                svg.append("image")
+                    .attr("href","data/x-icon.png")
+                    .attr("width", 19)
+                    .attr("x", 52)
+                    .attr("y", 0)
+                    .on("click", ()=> clear_type_filter(type))
+
+            }
+        }
+
+        let clear_type_filter_button = row1.append("td")
+            .attr("rowspan", 3)
+            .append("svg").classed("filter_button", true)
+            .attr("width", 20)
+            .attr("height", 60)
+            .on("click", clear_type_filters)
+        clear_type_filter_button.append("rect")
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .attr("rx", 7)
+            .classed("svg_background", true);
+        clear_type_filter_button.append("image")
+            .attr("href","data/x-icon.png")
+            .attr("width", 19)
+            .attr("x", 0)
+            .attr("y", 20)
+
+
+        row1.append("td").attr("rowspan",3).attr("width", 10)
+
+
+        let filter_gens = []
+        let gen_filter = function(data){
+            if(filter_gens.length == 0){
+                return true;
+            } else {
+                return filter_gens.includes(+data.gen_introduced)
+            }
+        }
+
+        that.fancydex.addFilter(gen_filter)
+
+        let toggle_gen_filter = function(gen){
+            // Un-filter
+            if(filter_gens.includes(gen)){
+                d3.select("#gen_filter_"+gen)
+                    .classed("filter_select", false)
+
+                let index = filter_gens.indexOf(gen);
+                if (index !== -1) filter_gens.splice(index, 1);
+                // console.log("Filtering", filter_gens)
+            } else{ // Filter
+                console.log("Filter",gen);
+                d3.select("#gen_filter_"+gen)
+                    .classed("filter_select", true)
+                if(! filter_gens.includes(gen)){
+                    filter_gens.push(gen)
+                }
+                // console.log("Filtering", filter_gens)
+            }
+
+            // Refresh the data to make it re-filter
+            that.fancydex.setData(that.pokemon)
+        }
+        let clear_gen_filters = function(){
+            d3.selectAll(".gen_filter")
+                .classed("filter_select", false)
+            filter_gens = [];
+
+            that.fancydex.setData(that.pokemon)
+        }
+
+        for (let [row, gens] of [[row1,[1,2,3]],[row2,[4,5,6]],[row3,[7]]]){
+            for (let gen of gens){
+                let svg = row.append("td").append("svg").classed("filter_button", true)
+                    .attr("id", "gen_filter_"+gen)
+                    .classed("gen_filter", true)
+                    .attr("width", 20)
+                    .attr("height", 20)
+                    .on("click",() => toggle_gen_filter(gen))
+                svg.append("rect")
+                    .attr("width", "100%")
+                    .attr("height", "100%")
+                    .attr("rx", 7)
+                    .classed("svg_background", true)
+                svg.append("text")
+                    .attr("x","50%")
+                    .attr("y","55%")
+                    .attr("dominant-baseline","middle")
+                    .attr("text-anchor","middle")
+                    .text(gen)
+            }
+        }
+
+        let clear_gen_filter_button = row3.append("td")
+            .attr("colspan", 2)
+            .append("svg").classed("filter_button", true)
+            .attr("width", 40)
+            .attr("height", 20)
+            .on("click", clear_gen_filters)
+        clear_gen_filter_button.append("rect")
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .attr("rx", 7)
+            .classed("svg_background", true);
+        clear_gen_filter_button.append("image")
+            .attr("href","data/x-icon.png")
+            .attr("width", 19)
+            .attr("x", 10)
+            .attr("y", 0)
+
+
+        row1.append("td").attr("rowspan",3).attr("width", 10)
+
+
+        let filter_final_ev = false;
+        let filter_base_ev = false;
+
+        let filter_evs = function(data){
+            if(!filter_final_ev && !filter_base_ev){
+                return true
+            }
+            if( filter_final_ev &&  filter_base_ev){
+                return data.is_full_ev==1 || data.is_base==1;
+            }
+            if(!filter_final_ev &&  filter_base_ev){
+                return data.is_base==1;
+            }
+            if( filter_final_ev && !filter_base_ev){
+                return data.is_full_ev==1;
+            }
+        };
+        this.fancydex.addFilter(filter_evs)
+
+        let filter_final = function(){
+            filter_final_ev = true;
+            d3.select("#final_ev_filter")
+                .classed("filter_select", true)
+            // Refresh the data to make it re-filter
+            that.fancydex.setData(that.pokemon)
+        }
+        let filter_base = function(){
+            filter_base_ev = true;
+            d3.select("#base_ev_filter")
+                .classed("filter_select", true)
+            // Refresh the data to make it re-filter
+            that.fancydex.setData(that.pokemon)
+        }
+        let clear_filter_final = function(){
+            filter_final_ev = false;
+            d3.select("#final_ev_filter")
+                .classed("filter_select", false)
+            // Refresh the data to make it re-filter
+            that.fancydex.setData(that.pokemon)
+        }
+        let clear_filter_base = function(){
+            filter_base_ev = false;
+            d3.select("#base_ev_filter")
+                .classed("filter_select", false)
+            // Refresh the data to make it re-filter
+            that.fancydex.setData(that.pokemon)
+        }
+
+        let clear_ev_filter = function(){
+            filter_final_ev = false;
+            filter_base_ev = false;
+            d3.select("#final_ev_filter")
+                .classed("filter_select", false)
+            d3.select("#base_ev_filter")
+                .classed("filter_select", false)
+            // Refresh the data to make it re-filter
+            that.fancydex.setData(that.pokemon)
+        }
+
+        let is_final_ev = row1.append("td")
+            .append("svg").classed("filter_button", true)
+            .attr("width", 90)
+            .attr("height", 20)
+            .attr("id", "final_ev_filter")
+        is_final_ev.append("rect")
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .attr("rx", 7)
+            .classed("svg_background", true);
+        is_final_ev.append("text")
+            .attr("x","3%")
+            .attr("y","55%")
+            .attr("dominant-baseline","middle")
+            .text("Final Evol.")
+            .on("click", filter_final)
+        is_final_ev.append("image")
+            .attr("href","data/x-icon.png")
+            .attr("width", 19)
+            .attr("x", 68)
+            .attr("y", 0)
+            .on("click", clear_filter_final)
+
+
+        let is_base_ev = row2.append("td")
+            .append("svg").classed("filter_button", true)
+            .attr("width", 90)
+            .attr("height", 20)
+            .attr("id", "base_ev_filter")
+        is_base_ev.append("rect")
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .attr("rx", 7)
+            .classed("svg_background", true);
+        is_base_ev.append("text")
+            .attr("x","3%")
+            .attr("y","55%")
+            .attr("dominant-baseline","middle")
+            // .attr("text-anchor","middle")
+            .text("Base Evol.")
+            .on("click", filter_base)
+        is_base_ev.append("image")
+            .attr("href","data/x-icon.png")
+            .attr("width", 19)
+            .attr("x", 68)
+            .attr("y", 0)
+            .on("click", clear_filter_base)
+
+
+        let clear_ev = row3.append("td")
+            .append("svg").classed("filter_button", true)
+            .attr("width", 90)
+            .attr("height", 20)
+            .on("click", clear_ev_filter)
+        clear_ev.append("rect")
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .attr("rx", 7)
+            .classed("svg_background", true);
+        clear_ev.append("image")
+            .attr("href","data/x-icon.png")
+            .attr("width", 19)
+            .attr("transform", "translate(-9.5,0)")
+            .attr("x", "50%")
+            .attr("y", 0)
+
+
+
+        row1.append("td").attr("rowspan",3).attr("width", 10)
+
+
+
+        let legendary_val = null;
+        let legendary_filter = function(data){
+            if(legendary_val === null){
+                return true
+            }
+            if(legendary_val){
+                return data.is_legendary==1
+            } else{
+                return data.is_legendary!=1
+            }
+        }
+        this.fancydex.addFilter(legendary_filter)
+        let toggle_legendary_filter = function(which){
+            // Clear filter
+            if(which == null){
+                legendary_val = null;
+                d3.select("#is_legend_filter").classed("filter_select", false)
+                d3.select("#is_not_legend_filter").classed("filter_select", false)
+            }
+            // Show Legendaries
+            else if(which){
+                legendary_val = true;
+                d3.select("#is_legend_filter").classed("filter_select", true)
+                d3.select("#is_not_legend_filter").classed("filter_select", false)
+            }
+            // Show not Legendaries
+            else if(!which){
+                legendary_val = false;
+                d3.select("#is_legend_filter").classed("filter_select", false)
+                d3.select("#is_not_legend_filter").classed("filter_select", true)
+            }
+            that.fancydex.setData(that.pokemon)
+        }
+
+        let is_legend = row1.append("td")
+            .append("svg").classed("filter_button", true)
+            .attr("width", 90)
+            .attr("height", 20)
+            .attr("id", "is_legend_filter")
+        is_legend.append("rect")
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .attr("rx", 7)
+            .classed("svg_background", true);
+        is_legend.append("text")
+            .attr("x","3%")
+            .attr("y","55%")
+            .attr("dominant-baseline","middle")
+            .text("Legendaries")
+            .on("click", ()=>toggle_legendary_filter(true))
+
+
+        let is_not_legend = row2.append("td")
+            .append("svg").classed("filter_button", true)
+            .attr("width", 90)
+            .attr("height", 20)
+            .attr("id", "is_not_legend_filter")
+        is_not_legend.append("rect")
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .attr("rx", 7)
+            .classed("svg_background", true);
+        is_not_legend.append("text")
+            .attr("x","3%")
+            .attr("y","55%")
+            .attr("dominant-baseline","middle")
+            .text("Not Legend.")
+            .on("click", () => toggle_legendary_filter(false))
+
+        let clear_legendary_filter = row3.append("td")
+            .append("svg").classed("filter_button", true)
+            .attr("width", 90)
+            .attr("height", 20)
+            .on("click", ()=>toggle_legendary_filter(null))
+        clear_legendary_filter.append("rect")
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .attr("rx", 7)
+            .classed("svg_background", true);
+        clear_legendary_filter.append("image")
+            .attr("href","data/x-icon.png")
+            .attr("width", 19)
+            .attr("transform", "translate(-9.5,0)")
+            .attr("x", "50%")
+            .attr("y", 0)
+
+
+
+        row1.append("td").attr("rowspan",3).attr("width", 10)
+
+
+
+        let clear_all_filters = function(){
+            toggle_legendary_filter(null)
+            clear_gen_filters()
+            clear_type_filters()
+            clear_ev_filter()
+        }
+
+
+        let clear_all_button = row1.append("td")
+            .attr("rowspan", 3)
+            .append("svg").classed("filter_button", true)
+            .attr("width", 80)
+            .attr("height", 60)
+            .on("click", clear_all_filters)
+        clear_all_button.append("rect")
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .attr("rx", 7)
+            .classed("svg_background", true);
+        clear_all_button.append("text")
+            .attr("x","50%")
+            .attr("y","30%")
+            .attr("dominant-baseline","middle")
+            .attr("text-anchor","middle")
+            .text("Clear All")
+        clear_all_button.append("image")
+            .attr("href","data/x-icon.png")
+            .attr("width", 19)
+            .attr("transform", "translate(-9.5,-9.5)")
+            .attr("x", "50%")
+            .attr("y", "70%")
+
+
 
     }
 
