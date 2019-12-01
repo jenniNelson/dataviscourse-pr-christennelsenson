@@ -88,6 +88,19 @@ table.sortable thead {
     opacity: .8;
 }
 
+rect.svg_background{
+    fill: #ebebeb;
+}
+.filter_select > rect.svg_background {
+    /*opacity: 1;*/
+
+    fill: #928c83;
+}
+
+.filter_button {
+    cursor: pointer;
+}
+
 
 span.game_title {
     margin-right: 3px;

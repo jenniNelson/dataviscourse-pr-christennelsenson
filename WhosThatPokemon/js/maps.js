@@ -179,7 +179,7 @@ class MapView {
                     .then(data => {
                         d3.select("#"+d.map_id)
                             .append("div")
-                            .attr("width",500)
+                            .attr("height",400)
                             .node().append(data.documentElement)
                     })
             })
