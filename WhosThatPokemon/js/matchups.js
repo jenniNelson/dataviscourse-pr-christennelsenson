@@ -16,8 +16,9 @@ class Matchups{
         this.poke_dict = pokemon;
         this.mons = Object.values(pokemon).sort((a,b)=>+a.long_id - +b.long_id);
         this.mons.push(missingno);
+        console.log(this.mons)
 
-        this.current_view = "vs";
+        this.current_view = "team";
 
         this.num_vs = 2;
         this.num_team = 6;
@@ -70,12 +71,13 @@ class Matchups{
         let that = this;
         d3.selectAll("#view_switcher .tablinks").data(["vs", "team"])
             .on("click", d=>that.switch_tabs(d));
-        console.log("heer");
-        d3.select("#vs_button")
+        d3.select("#team_builder_button")
             .classed("active", true);
     }
 
     switch_tabs(name) {
+        if(name === this.current_view)
+            return
         d3.selectAll(".lef_table")
             .classed("hidden", true);
         d3.selectAll("#view_switcher .tablinks")
@@ -89,7 +91,8 @@ class Matchups{
             d3.select("#matchup_summary")
                 .classed("hidden", false);
             this.current_view = "vs"
-        } else if (name === "team" && this.current_view !== "team") {
+        }
+        else if (name === "team" && this.current_view !== "team") {
             d3.select("#team_builder_button")
                 .classed("active", true);
             d3.select("#team_build_table")
@@ -117,7 +120,7 @@ class Matchups{
                 .selectAll("option").data(this.mons).join("option")
                 .property("selected", d=>d.long_id === this.card_manager.vs[j])
                 .attr("value", d=>d.long_id)
-                .text( d => ((d.long_id === "whodat")?"(No Selection)":d.name + " (#" + d.long_id + ")"));
+                .text( d => (d.long_id === "whodat")?"(No Selection)":(d.name + " (#" + d.long_id + ")"));
 
             pane.append("svg")
                 .attr("id", "vs_svg_" + j)
@@ -401,7 +404,7 @@ class Matchups{
 
         let mons =[];
         for(let i =0; i < 2; i++) {
-            if(this.card_manager.vs[i] !== null) {
+            if(this.card_manager.vs[i] !== null && this.card_manager.vs[i] !== "whodat") {
                 mons.push(this.poke_dict[this.card_manager.vs[i]])
             }
         }
@@ -622,7 +625,7 @@ class Matchups{
         let chart_group = background.append("g").attr("transform", "translate(500, 40)");
         chart_group.append("rect").attr("x",0).attr("y",0).attr("width",380).attr("height", 400)
             .attr("rx", 10)
-            .attr("fill", "#c9df93").attr("stroke", "#353535").attr("stroke-width", "3px");
+            .attr("fill", "#f1fce9").attr("stroke", "#353535").attr("stroke-width", "3px");
         chart_group.append("g").attr("transform","translate(370, 390)")
             .call(this.reverse_stat_axis).call(g=>g.select(".domain").remove());
         let mark_group = chart_group.append("g").attr("transform", "translate(45,390)");
@@ -670,7 +673,14 @@ class Matchups{
             .attr("y", 0)
             .attr("transform",(d,i) => "translate("+(60*i) + ",10) rotate(-35)")
             .text(d=>d)
+            .style("font-weight", "bold")
+            .style("text-anchor", "end");
+
+        chart_group.append("text").attr("x", 370).attr("y", 30)
+            .style("font-weight", "bold")
+            .style("font-size", "14pt")
             .style("text-anchor", "end")
+            .text("Stat Distributions");
 
         let coverage_group = background.append("g").attr("transform","translate(20, 40)")
         let covered_group = coverage_group.append("g");
@@ -683,17 +693,53 @@ class Matchups{
             .attr("stroke", "#353535")
             .attr("stroke-width", "2px");
 
+        covered_group.selectAll("image").data(type_coverage_data.covered).join("image")
+            .attr("x", (d,i) => 10 + 70 * (i%6))
+            .attr("y", (d,i) => 30 + (30*Math.floor(i/6)))
+            .attr("width", 80)
+            .attr("height", 20)
+            .attr("href", d => "data/pokemon_data/typelabels/" + d + ".gif");
+
+        covered_group.append("text").attr("x", 15).attr("y", 15)
+            .style("font-weight", "bold")
+            .style("font-size", "14pt")
+            .text("Types Covered:");
+
         uncovered_group.append("rect").attr("x", 0).attr("y", 0).attr("width", 450).attr("height", 120)
             .attr("rx", 10)
             .attr("fill", "#b7b7b7")
             .attr("stroke", "#353535")
             .attr("stroke-width", "2px");
 
+        uncovered_group.selectAll("image").data(type_coverage_data.uncovered).join("image")
+            .attr("x", (d,i) => 10 + 70 * (i%6))
+            .attr("y", (d,i) => 30 + (30*Math.floor(i/6)))
+            .attr("width", 80)
+            .attr("height", 20)
+            .attr("href", d => "data/pokemon_data/typelabels/" + d + ".gif");
+
+        uncovered_group.append("text").attr("x", 15).attr("y", 15)
+            .style("font-weight", "bold")
+            .style("font-size", "14pt")
+            .text("Types Not Yet Covered:");
+
         weakness_group.append("rect").attr("x", 0).attr("y", 0).attr("width", 450).attr("height", 120)
             .attr("rx", 10)
             .attr("fill", "#b7b7b7")
             .attr("stroke", "#353535")
             .attr("stroke-width", "2px");
+
+        weakness_group.selectAll("image").data(type_coverage_data.weak_to).join("image")
+            .attr("x", (d,i) => 10 + 70 * (i%6))
+            .attr("y", (d,i) => 30 + (30*Math.floor(i/6)))
+            .attr("width", 80)
+            .attr("height", 20)
+            .attr("href", d => "data/pokemon_data/typelabels/" + d + ".gif");
+
+        weakness_group.append("text").attr("x", 15).attr("y", 15)
+            .style("font-weight", "bold")
+            .style("font-size", "14pt")
+            .text("Types Strong Against This Team:");
 
     }
 
