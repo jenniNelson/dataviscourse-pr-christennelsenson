@@ -54,6 +54,8 @@ class Matchups{
         ];
 
         this.stat_scale =d3.scaleLinear().domain([0,250]).range([0,250]);
+        this.reverse_stat_scale = d3.scaleLinear().domain([0,250]).range([0,-375]);
+        this.reverse_stat_axis = d3.axisLeft(this.reverse_stat_scale).tickSize(345).ticks(5);
         this.stat_axis = d3.axisBottom(this.stat_scale).tickSize(100).ticks(5);
 
         this.hp_bar_scale = d3.scaleLinear().domain([0,1]).range([0,300]);
@@ -403,19 +405,18 @@ class Matchups{
                 mons.push(this.poke_dict[this.card_manager.vs[i]])
             }
         }
-        console.log(mons)
 
         d3.select("#vs_sum_svg").select("g").remove();
-        let pallet = d3.select("#vs_sum_svg").append("g")
+        let pallet = d3.select("#vs_sum_svg").append("g");
 
-        let background = pallet.append("g").attr("transform", "translate(5,5)")
+        let background = pallet.append("g").attr("transform", "translate(5,5)");
 
         if(mons.length === 2) {
             background.append("rect")
                 .attr("x", 0)
                 .attr("y", 0)
                 .attr("width", 890)
-                .attr("height", 490)
+                .attr("height", 320)
                 .attr("fill", "#b7b7b7")
                 .attr("rx", 10);
             background.append("text")
@@ -445,13 +446,13 @@ class Matchups{
             let right_ph_perc = Math.max((right_hp - right_ph_damage)/right_hp,0);
             let right_sp_perc = Math.max((right_hp - right_sp_damage)/right_hp,0);
 
-            console.log(mons[1].name, "does",left_ph_damage, "physical damage to", left_hp, ":", left_ph_perc);
-            console.log(mons[1].name, "does",left_sp_damage, "special damage to", left_hp, ":", left_sp_perc);
-            console.log(mons[0].name, "does",right_ph_damage, "physical damage to", right_hp, ":", right_ph_perc);
-            console.log(mons[0].name, "does",right_sp_damage, "special damage to", right_hp, ":", right_sp_perc);
+            let left_turns_to_faint = Math.min(Math.ceil(1/(1-left_ph_perc)), Math.ceil(1/(1-left_sp_perc)));
+            let right_turns_to_faint = Math.min(Math.ceil(1/(1-right_ph_perc)),Math.ceil(1/(1-right_sp_perc)));
 
+            let left_pref = (right_ph_perc > right_sp_perc)?"special":"physical";
+            let right_pref = (left_ph_perc > left_sp_perc)?"special":"physical";
 
-            let hp_bar_group = background.append("g").attr("transform", "translate(445, 60)")
+            let hp_bar_group = background.append("g").attr("transform", "translate(445, 60)");
 
             hp_bar_group.append("line").attr("x1", 0).attr("y1", 0).attr("x2", 0).attr("y2", 110)
                 .style("stroke", "gray").style("stroke-width", 3);
@@ -461,8 +462,114 @@ class Matchups{
             this.draw_hp_bar(hp_bar_group, right_ph_perc, 100, 10, true, mons[1]);
             this.draw_hp_bar(hp_bar_group, right_sp_perc, 100, 80, false,mons[1]);
 
+            this.draw_speed_arrow(hp_bar_group, mons[0], mons[1], 0, 50);
+
+            let winner_group = background.append("g").attr("transform", "translate(250, 200)");
+
+            this.draw_winner(winner_group, left_turns_to_faint, right_turns_to_faint, left_pref, right_pref)
+
         } else {
-            // TODO
+            background.append("rect")
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", 890)
+                .attr("height", 40)
+                .attr("fill", "#b7b7b7")
+                .attr("rx", 10);
+            background.append("text")
+                .attr("x", 445)
+                .attr("y", 20)
+                .attr("text-anchor", "middle")
+                .text("PLEASE SELECT 2 POKEMON TO COMPARE")
+                .style("font-weight", "bold")
+                .style("font-size", "14pt")
+                .style("text-decoration", "underline");
+        }
+    }
+
+    draw_winner(group, left_to_faint, right_to_faint, lpref, rpref) {
+        let left = this.poke_dict[this.card_manager.vs[0]];
+        let right = this.poke_dict[this.card_manager.vs[1]];
+        let winner, turns_to_end, strat;
+        if(left_to_faint > right_to_faint) {
+            winner = left;
+            turns_to_end = right_to_faint;
+            strat = lpref;
+        } else if (right_to_faint > left_to_faint) {
+            winner = right;
+            turns_to_end = left_to_faint;
+            strat = rpref;
+        } else {
+            if(left.speed > right.speed) {
+                winner = left;
+                turns_to_end = right_to_faint;
+                strat = lpref;
+            } else if (right.speed > left.speed) {
+                winner = right;
+                turns_to_end = left_to_faint;
+                strat = rpref;
+            }
+            else {
+                winner = missingno;
+                turns_to_end = 0;
+            }
+        }
+        group.append("circle").attr("cx", 50).attr("cy", 50).attr("r", 45)
+            .attr("fill", "#7f7f7f");
+        group.append("image").attr("x", 5).attr("y", 5).attr("width", 90).attr("height", 90)
+            .attr("href", "data/pokemon_data/sprites/" + winner.long_id + ".png");
+        group.append("text").attr("x", 100).attr("y", 40)
+            .text((winner.stat_total > 0?(winner.name + " will win in " + turns_to_end + " turn" + (turns_to_end>1?"s":"") + " using " + strat + " moves."):"It's too close to call!"))
+
+    }
+
+    draw_speed_arrow(group, left, right, x, y) {
+        if(left.speed > right.speed) {
+            group.append("g").attr("transform", "translate("+(x+10)+","+y+")").append("path")
+                .attr("fill", "#fff240")
+                .attr("d",`
+                M 0 -15
+                L -15 -15
+                L -15 -30
+                L -45 0
+                L -15 30
+                L -15 15
+                L 15 15
+                L 15 -15
+                Z
+                `);
+            group.append("text").attr("x", x-4).attr("y", y+2)
+                .style("font-weight", "bold")
+                .style("text-anchor", "middle")
+                .style("font-size", "7pt")
+                .text("GOES FIRST")
+        } else if (right.speed > left.speed) {
+            group.append("g").attr("transform", "translate("+(x - 10)+","+y+")").append("path")
+                .attr("fill", "#fff240")
+                .attr("d",`
+                M 0 15
+                L 15 15
+                L 15 30
+                L 45 0
+                L 15 -30
+                L 15 -15
+                L -15 -15
+                L -15 15
+                Z
+                `);
+            group.append("text").attr("x", x+4).attr("y", y+2)
+                .style("font-weight", "bold")
+                .style("text-anchor", "middle")
+                .style("font-size", "7pt")
+                .text("GOES FIRST")
+        } else {
+            group.append("rect").attr("x", x-30).attr("y", y-20).attr("width", 60).attr("height", 35)
+                .attr("fill", "#fff240");
+            group.append("text").attr("x", x).attr("y", y)
+                .style("font-weight", "bold")
+                .style("text-anchor", "middle")
+                .style("font-size", "7pt")
+                .text("SPEED TIE")
         }
     }
 
@@ -482,14 +589,176 @@ class Matchups{
     }
 
     draw_team_summary() {
-        let mons = []
-        for(let i =0; i < 2; i++) {
-            mons.push(this.poke_dict[this.card_manager.team[i]])
+        let mons = [];
+        for(let i =0; i < 6; i++) {
+            if(this.card_manager.team[i] !== "whodat" && this.card_manager.team[i] !== null) {
+                mons.push(this.poke_dict[this.card_manager.team[i]])
+            }
         }
-        let pallet = d3.select("#team_summary").append("svg")
+
+        let type_coverage_data = get_type_coverage(mons);
+
+        console.log(mons);
+
+        d3.select("#tb_sum_svg").select("g").remove();
+        let pallet = d3.select("#tb_sum_svg").append("g");
+
+        let background = pallet.append("g").attr("transform", "translate(5,5)");
+        background.append("rect")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("width", 890)
+            .attr("height", 500)
+            .attr("fill", "#b7b7b7")
+            .attr("rx", 10);
+        background.append("text")
+            .attr("x", 445)
+            .attr("y", 20)
+            .attr("text-anchor", "middle")
+            .text("TEAM SUMMARY")
+            .style("font-weight", "bold")
+            .style("font-size", "14pt")
+            .style("text-decoration", "underline");
+        let chart_group = background.append("g").attr("transform", "translate(500, 40)");
+        chart_group.append("rect").attr("x",0).attr("y",0).attr("width",380).attr("height", 400)
+            .attr("rx", 10)
+            .attr("fill", "#c9df93").attr("stroke", "#353535").attr("stroke-width", "3px");
+        chart_group.append("g").attr("transform","translate(370, 390)")
+            .call(this.reverse_stat_axis).call(g=>g.select(".domain").remove());
+        let mark_group = chart_group.append("g").attr("transform", "translate(45,390)");
+
+        mark_group.append("line").attr("x1", -14).attr("y1", this.reverse_stat_scale(70)).attr("x2", 330).attr("y2", this.reverse_stat_scale(70))
+            .style("stroke-dasharray", "2 1")
+            .style("stroke", "black")
+            .style("stroke-width", 1)
+            .style("opacity", 1)
+            .append("title")
+            .text("Rough average across all evolved Pokemon");
+        mark_group.append("text").attr("x", -16).attr("y", this.reverse_stat_scale(70)+2)
+            .style("text-anchor", "end")
+            .style("font-size", "7pt")
+            .style("opacity", .8)
+            .text("(norm.)")
+            .append("title")
+            .text("Rough average across all evolved Pokemon");
+
+        mark_group.selectAll("g").data(mons).join("g")
+            .attr("title", d=>d.name)
+            .selectAll("circle").data(d=>[
+            {name:d.name,stat:d.hp,type:d.type1},
+            {name:d.name,stat:d.attack,type:d.type1},
+            {name:d.name,stat:d.defense,type:d.type1},
+            {name:d.name,stat:d.sp_attack,type:d.type1},
+            {name:d.name,stat:d.sp_defense,type:d.type1},
+            {name:d.name,stat:d.speed,type:d.type1}
+            ]).join("ellipse")
+                .attr("cx", (d,i) => 60*i)
+                .attr("cy", d => this.reverse_stat_scale(d.stat))
+                .attr("rx", 6)
+                .attr("ry", 3)
+                .attr("fill", d => this.type_colors[d.type][0])
+                .attr("stroke", d => this.type_colors[d.type][1])
+                .attr("stroke-width", 2)
+                .style("opacity", 1)
+                .attr("cursor", "pointer")
+                .append("title")
+                    .text(d=>d.name + ", " + d.stat)
+
+        let label_group = chart_group.append("g").attr("transform","translate(45, 400)")
+        label_group.selectAll("text").data(["HP","Attack","Defense","S. Attack", "S. Defense", "Speed"]).join("text")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("transform",(d,i) => "translate("+(60*i) + ",10) rotate(-35)")
+            .text(d=>d)
+            .style("text-anchor", "end")
+
+        let coverage_group = background.append("g").attr("transform","translate(20, 40)")
+        let covered_group = coverage_group.append("g");
+        let uncovered_group = coverage_group.append("g").attr("transform", "translate(0,140)");
+        let weakness_group = coverage_group.append("g").attr("transform", "translate(0, 280)");
+
+        covered_group.append("rect").attr("x", 0).attr("y", 0).attr("width", 450).attr("height", 120)
+            .attr("rx", 10)
+            .attr("fill", "#b7b7b7")
+            .attr("stroke", "#353535")
+            .attr("stroke-width", "2px");
+
+        uncovered_group.append("rect").attr("x", 0).attr("y", 0).attr("width", 450).attr("height", 120)
+            .attr("rx", 10)
+            .attr("fill", "#b7b7b7")
+            .attr("stroke", "#353535")
+            .attr("stroke-width", "2px");
+
+        weakness_group.append("rect").attr("x", 0).attr("y", 0).attr("width", 450).attr("height", 120)
+            .attr("rx", 10)
+            .attr("fill", "#b7b7b7")
+            .attr("stroke", "#353535")
+            .attr("stroke-width", "2px");
+
     }
 
 
+}
+
+function get_type_coverage(mons) {
+    if(mons.length === 0) {
+        return {covered: [], uncovered:[], weak_to: []}
+    }
+    let covered = [], uncovered = [], weak_to = []
+    for(let type of idx_to_types) {
+        if (team_can_cover(mons, type))
+            covered.push(type);
+        if (team_weak_to(mons, type))
+            weak_to.push(type);
+    }
+    for (let type of idx_to_types) {
+        if (! covered.includes(type)) {
+            uncovered.push(type)
+        }
+    }
+    return {covered: covered, uncovered: uncovered, weak_to: weak_to}
+}
+
+function team_weak_to(mons, type) {
+    let total = 0;
+    for (let mon of mons) {
+        if (is_weak_to(mon, type)) {
+            total += 1
+        }
+    }
+    if (total / mons.length > 1/3) {
+        return true;
+    }
+}
+
+function team_can_cover(mons, type) {
+    for (let mon of mons) {
+        if(can_cover(mon, type))
+            return true
+    }
+    return false
+}
+
+function is_weak_to(mon, type) {
+    let idx1 = types_to_idx[mon.type1];
+    let atkidx = types_to_idx[type];
+    if(mon.type2 !== '' && mon.type2 !== mon.type1) {
+        let idx2 = types_to_idx[mon.type2];
+        return matchups[atkidx][idx1] * matchups[atkidx][idx2] > 1
+    } else {
+        return matchups[atkidx][idx1] > 1
+    }
+}
+
+function can_cover(mon, type) {
+    let idx1 = types_to_idx[mon.type1];
+    let defidx = types_to_idx[type];
+    if(mon.type2 !== '' && mon.type2 !== mon.type1) {
+        let idx2 = types_to_idx[mon.type2];
+        return Math.max(matchups[idx1][defidx] , matchups[idx2][defidx]) > 1
+    } else {
+        return matchups[idx1][defidx] > 1
+    }
 }
 
 function hp_stat(mon, level) {
@@ -498,22 +767,29 @@ function hp_stat(mon, level) {
 }
 
 function damage(attack_mon, receive_mon, is_special, level, power) {
-    // return Math.floor(
-    //     Math.floor(
-    //     Math.floor((Math.floor(2*level/5) + 2)
-    //                     *power*Math.floor(is_special?attack_mon.sp_attack/receive_mon.sp_defense:attack_mon.attack/receive_mon.defense)
-    //                     /50
-    //     ) + 2)
-    //     *type_modifier(attack_mon, receive_mon)
-    // )
 
     let topleft = 2*level/5 + 2;
-    let ratio = is_special?(attack_mon.sp_attack/receive_mon.sp_defense): (attack_mon.attack/receive_mon.defense);
+    let ratio = a_d_ratio(attack_mon, receive_mon, is_special, level);
     let modifier = type_modifier(attack_mon, receive_mon);
-    console.log(topleft, "|", ratio, "|", modifier);
     return Math.floor((Math.floor(topleft*power*ratio/50) + 2)*modifier)
 
 
+}
+
+function a_d_ratio(attacker, defender, spec, lvl) {
+    let attack, defense;
+    if(spec) {
+        attack = stat(attacker.sp_attack, lvl);
+        defense = stat(defender.sp_defense, lvl);
+    } else {
+        attack = stat(attacker.attack, lvl);
+        defense = stat(defender.defense, lvl);
+    }
+    return attack / defense;
+}
+
+function stat(base, level=50) {
+    return (2*base+15)*level/100 + 5
 }
 
 function type_modifier(attacker, defender) {
