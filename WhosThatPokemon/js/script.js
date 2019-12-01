@@ -5,13 +5,15 @@ loadData().then(poke_dict => {
     console.log(poke_dict)
 
     let card_manager = new CardManager();
-    let pokedex = new Pokedex(poke_dict, card_manager);
+    // let pokedex = new Pokedex(poke_dict, card_manager);
     let matchupview = new Matchups(poke_dict, card_manager);
     let mapview = new MapView(poke_dict, card_manager);
 
+    let fancydex = new FancyDex(poke_dict, card_manager);
+
     card_manager.update_objects();
 
-    console.log(pokedex);
+    // console.log(pokedex);
 
 
 });
@@ -127,7 +129,7 @@ class CardManager{
         if(checkbox === true) {
             let none_free = true;
             for (let i of [0, 1, 2, 3, 4, 5]) {
-                if (this.team[i] == null) {
+                if (this.team[i] == null || this.vs[i] === "whodat") {
                     this.team[i] = to_who;
                     this.team.queue.push(i);
                     none_free = false;
@@ -179,7 +181,7 @@ class CardManager{
         if(checkbox === true) {
             let none_free = true;
             for (let i of [0, 1]) {
-                if (this.vs[i] == null) {
+                if (this.vs[i] == null || this.vs[i] === "whodat") {
                     this.vs[i] = to_who;
                     this.vs.queue.push(i);
                     none_free = false;
@@ -209,7 +211,7 @@ class CardManager{
             }
         }
 
-        if(to_who === null) {
+        if(to_who === null ) {
             to_who = "whodat"
         }
 
