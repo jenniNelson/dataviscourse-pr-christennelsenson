@@ -43,7 +43,9 @@ table.sortable thead {
     cursor: default;
 }
 
-
+.map_card{
+    width:300px;
+}
 .map_img {
   display: block;
   margin-left: auto;
