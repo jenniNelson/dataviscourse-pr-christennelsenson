@@ -28,59 +28,15 @@ async function loadData() {
         pokemon_dict[mon.long_id] = new Pokemon(mon)
     }
 
-
-//     locs = locs.reduce((accum_obj, item) => {
-//         let loc_string = item.locations
-//
-//         let locs = loc_string.replace(/\]/g,"")
-//                 .replace(/\[/g,"")
-//                 .replace(/\'/g, "")
-//                 .trim()
-//                 .split(",");
-//         // console.log(locs)
-//         item.locations = locs.map( x => {
-//             x = x.trim();
-//             // console.log(x)
-//             if (x.length > 0){
-//                 let [game,map,place] = x.split('/')
-//                 return {
-//                     game: game,
-//                     map: map,
-//                     place: place,
-//                     place_id : place.replace(' ', '_').replace('.', '')
-//                 };
-//             } else{
-//                 return undefined;
-//             }
-//
-// //                                                                []=> ''.split
-//         }).filter(x => x !== undefined);
-//
-//         accum_obj[item.id] = item;
-//
-//         return accum_obj
-//     }, {} );
-//     return [pokemon, locs]
     return pokemon_dict
 }
 
 async function loadFile(file) {
     let data = await d3.csv(file);
-    // .then(d => {
-    //     let mapped = d.map(g => {
-    //         for (let key in g) {
-    //             let numKey = +key;
-    //             if (numKey) {
-    //                 g[key] = +g[key];
-    //             }
-    //         }
-    //         return g;
-    //     });
-    //     return mapped;
-    // });
     return data;
 }
 
+/** A class for managing who is selected in VS / Team Builder views.  **/
 class CardManager{
     constructor() {
         this.vs = {
@@ -101,10 +57,12 @@ class CardManager{
         this.callbacks = []
     }
 
+    /** Add a callback for this class to call when a change is made to a selection **/
     add_callback(callback){
         this.callbacks.push(callback)
     }
 
+    /** Change who is selected in a particular list **/
     update_pokemon(which_list, which_card, to_who, checkbox=null){
         // console.log(which_list, which_card, to_who, checkbox)
         if(which_list==="vs" || which_list==="#vs" || which_list==="pvp"){
@@ -114,6 +72,7 @@ class CardManager{
         }
     }
 
+    /** Change who is selected in the teambuilder list **/
     update_team(which_card, to_who, checkbox=null){
 
         // Not a checkbox-style change
@@ -166,6 +125,7 @@ class CardManager{
         this.update_objects("team", which_card, to_who)
     }
 
+    /** Change who is selected in the VS list **/
     update_vs(which_card, to_who, checkbox=null){
 
         // Not a checkbox-style change
@@ -218,10 +178,11 @@ class CardManager{
         this.update_objects("vs", which_card, to_who)
     }
 
+    /** Call all the registered callbacks **/
     update_objects(cat, which_card, to_who){
 
         // console.log(this.team, this.vs, this.callbacks)
-        console.log("YOOHOO", which_card)
+        // console.log("YOOHOO", which_card)
 
         for (let cb of this.callbacks){
             cb(cat, which_card, to_who);
@@ -231,6 +192,7 @@ class CardManager{
 
 }
 
+/** The data structure to hold all info about a particular pokemon **/
 class Pokemon{
     constructor(csv_result) {
         this.name = csv_result.name;

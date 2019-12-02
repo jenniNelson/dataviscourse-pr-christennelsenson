@@ -56,6 +56,7 @@ class FancyDex {
         this.max_sp_defense = d3.max(pokemon.map(p=>p.sp_defense));
         this.max_speed = d3.max(pokemon.map(p=>p.speed));
 
+        // This view needs slightly processed data
         this.pokemon = pokemon
             .map((p) => {
             let team = {};
@@ -110,6 +111,9 @@ class FancyDex {
     initialize_table(){
         let that = this;
 
+        /** Functions passed into tabulator **/
+
+        /** Use images to display type **/
         let type_formatter = function(cell, formatterParams, onRendered){;
             if( cell.getValue() === "") {
                 return "";
@@ -117,12 +121,15 @@ class FancyDex {
             return "<img width='50' src='data/pokemon_data/typelabels/" + cell.getValue() + ".gif'>";
         }
 
+        /** Two checkboxes **/
         let make_vs_buttons = function (cell, formatterParams, onRendered) {
             let data = cell.getValue();
             let button1 = "<input type='checkbox' " + (data[0]?"checked":"") + "/>";
             let button2 = "<input type='checkbox' " + (data[1]?"checked":"") + "/>";
             return button1+button2;
         }
+
+        /** Six checkboxes **/
         let make_team_buttons = function (cell, formatterParams, onRendered) {
             let data = cell.getValue();
             // console.log("TEAM",data)
@@ -135,6 +142,7 @@ class FancyDex {
             return buttonrow1 + "<br\>" + buttonrow2;
         }
 
+        /** Fancy way to update who is in VS **/
         let check_callback_vs = function(e, cell) {
             //e - the click event object
             //cell - cell component
@@ -161,6 +169,7 @@ class FancyDex {
             }
         }
 
+        /** Fancy way to update who is selected in Team builder **/
         let check_callback_team = function(e, cell) {
             //e - the click event object
             //cell - cell component
@@ -188,6 +197,7 @@ class FancyDex {
             }
         }
 
+        /** Sort table based on who has the most checks **/
         let check_sorter = function(a, b, aRow, bRow, column, dir, sorterParams){
             // console.log(a,b)
             let suma = 0;
@@ -201,23 +211,19 @@ class FancyDex {
             return sumb-suma;
         }
 
-        let stat_filter = function(MAX, headerValue, rowValue, rowData, filterParams){
-            console.log(MAX, headerValue, rowValue)
-            return (+headerValue)*100/MAX <= rowValue
-        }
 
+        /** EXTREMELY LONG BUT VERY USEFUL TABULATOR SETUP **/
         this.fancydex = new Tabulator("#fancydex", {
             height: 600,
             index:"long_id",
             responsiveLayout:"hide",
             data: this.pokemon,
             layout: "fitColumns",
-            // autoColumns:true
             initialSort:[{column:"long_id", dir:"asc"}],
             columns: [
-                {title:"Vs", field:"vs", width:50, dataLoaded:make_vs_buttons, formatter:make_vs_buttons, cellClick:check_callback_vs, sorter:check_sorter}
+                {title:"Vs", field:"vs", width:50, formatter:make_vs_buttons, cellClick:check_callback_vs, sorter:check_sorter}
                 ,
-                {title:"TB", field:"team", width:70,formatter:make_team_buttons, cellClick:check_callback_team, sorter:check_sorter}
+                {title:"TB", field:"team", width:70, formatter:make_team_buttons, cellClick:check_callback_team, sorter:check_sorter}
                 ,
                 {title:"#", field:"long_id", sorter:"number", headerFilter:"input",headerFilterPlaceholder:"Search", width:20}
                 ,
@@ -245,6 +251,15 @@ class FancyDex {
             ]
         });
 
+
+        /** NOW THE FILTER BUTTONS **/
+        let table_controls = d3.select("#table_controls").append("table")
+        let row1 = table_controls.append("tr")
+        let row2 = table_controls.append("tr")
+        let row3 = table_controls.append("tr")
+
+
+        /** Functions for type-filters **/
         let filtered_types = [];
         let type_filters = function(data, filterParams){
             if(filtered_types.length === 0){
@@ -254,8 +269,6 @@ class FancyDex {
             // console.log(in_something)
             return in_something
         }
-
-
         let filter_type = function(type){
             console.log("Filter",type)
             d3.select("#filter_"+type)
@@ -291,22 +304,11 @@ class FancyDex {
 
 
 
-        let table_controls = d3.select("#table_controls").append("table")
-        let row1 = table_controls.append("tr")
-        let row2 = table_controls.append("tr")
-        let row3 = table_controls.append("tr")
-
+        /** Create type filter buttons **/
         let row1_types = ["bug", "dark", "dragon", "electric", "fairy", "fighting"]
         let row2_types = ["fire", "flying", "ghost", "grass", "ground", "ice"]
         let row3_types = [ "normal", "poison", "psychic", "rock", "steel", "water"]
 
-        // let typebox = row1.selectAll("td").data(row1_types).join("td")
-        // typebox.append("img")
-        //     .attr("src",d => "data/pokemon_data/typelabels/"+ d + ".gif")
-        //     .attr("width", 50)
-        // typebox.append("td").append("button")
-        //     .text("x")
-        //     // .attr("style", "display:inline-block")
         for (let [row, types] of [[row1,row1_types],[row2,row2_types],[row3,row3_types]]){
             for (let type of types){
                 let svg = row.append("td").append("svg").classed("filter_button", true)
@@ -332,7 +334,6 @@ class FancyDex {
 
             }
         }
-
         let clear_type_filter_button = row1.append("td")
             .attr("rowspan", 3)
             .append("svg").classed("filter_button", true)
@@ -351,9 +352,11 @@ class FancyDex {
             .attr("y", 20)
 
 
+        /** Spacer row **/
         row1.append("td").attr("rowspan",3).attr("width", 10)
 
 
+        /** Filter by generation **/
         let filter_gens = []
         let gen_filter = function(data){
             if(filter_gens.length == 0){
@@ -362,9 +365,9 @@ class FancyDex {
                 return filter_gens.includes(+data.gen_introduced)
             }
         }
-
         that.fancydex.addFilter(gen_filter)
 
+        /** Toggle the generation filters **/
         let toggle_gen_filter = function(gen){
             // Un-filter
             if(filter_gens.includes(gen)){
@@ -395,6 +398,7 @@ class FancyDex {
             that.fancydex.setData(that.pokemon)
         }
 
+        /** Make gen filter buttons **/
         for (let [row, gens] of [[row1,[1,2,3]],[row2,[4,5,6]],[row3,[7]]]){
             for (let gen of gens){
                 let svg = row.append("td").append("svg").classed("filter_button", true)
@@ -416,7 +420,6 @@ class FancyDex {
                     .text(gen)
             }
         }
-
         let clear_gen_filter_button = row3.append("td")
             .attr("colspan", 2)
             .append("svg").classed("filter_button", true)
@@ -435,12 +438,13 @@ class FancyDex {
             .attr("y", 0)
 
 
+        /** Spacer column **/
         row1.append("td").attr("rowspan",3).attr("width", 10)
 
 
+        /** Filter by evolution status **/
         let filter_final_ev = false;
         let filter_base_ev = false;
-
         let filter_evs = function(data){
             if(!filter_final_ev && !filter_base_ev){
                 return true
@@ -497,6 +501,7 @@ class FancyDex {
             that.fancydex.setData(that.pokemon)
         }
 
+        /** Filter by evolution status buttons **/
         let is_final_ev = row1.append("td")
             .append("svg").classed("filter_button", true)
             .attr("width", 100)
@@ -544,8 +549,6 @@ class FancyDex {
             .attr("x", 78)
             .attr("y", 0)
             .on("click", clear_filter_base)
-
-
         let clear_ev = row3.append("td")
             .append("svg").classed("filter_button", true)
             .attr("width", 100)
@@ -564,11 +567,11 @@ class FancyDex {
             .attr("y", 0)
 
 
-
+        /** Spacer Column **/
         row1.append("td").attr("rowspan",3).attr("width", 10)
 
 
-
+        /** Filter by legendary status **/
         let legendary_val = null;
         let legendary_filter = function(data){
             if(legendary_val === null){
@@ -603,6 +606,7 @@ class FancyDex {
             that.fancydex.setData(that.pokemon)
         }
 
+        /** Legendary status filter buttons **/
         let is_legend = row1.append("td")
             .append("svg").classed("filter_button", true)
             .attr("width", 100)
@@ -656,11 +660,12 @@ class FancyDex {
             .attr("y", 0)
 
 
-
+        /** Spacer! **/
         row1.append("td").attr("rowspan",3).attr("width", 10)
 
 
 
+        /** Clear all the filters **/
         let clear_all_filters = function(){
             toggle_legendary_filter(null)
             clear_gen_filters()
@@ -668,7 +673,7 @@ class FancyDex {
             clear_ev_filter()
         }
 
-
+        /** Clear all button **/
         let clear_all_button = row1.append("td")
             .attr("rowspan", 3)
             .append("svg").classed("filter_button", true)
