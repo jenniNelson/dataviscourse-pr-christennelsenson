@@ -215,9 +215,9 @@ class FancyDex {
             // autoColumns:true
             initialSort:[{column:"long_id", dir:"asc"}],
             columns: [
-                {title:"Vs", field:"vs", width:48, dataLoaded:make_vs_buttons, formatter:make_vs_buttons, cellClick:check_callback_vs, sorter:check_sorter}
+                {title:"Vs", field:"vs", width:50, dataLoaded:make_vs_buttons, formatter:make_vs_buttons, cellClick:check_callback_vs, sorter:check_sorter}
                 ,
-                {title:"TB", field:"team", width:66,formatter:make_team_buttons, cellClick:check_callback_team, sorter:check_sorter}
+                {title:"TB", field:"team", width:70,formatter:make_team_buttons, cellClick:check_callback_team, sorter:check_sorter}
                 ,
                 {title:"#", field:"long_id", sorter:"number", width:20}
                 ,
