@@ -4,7 +4,7 @@
 
 
 ### Links:
-Project website: [jenniNelson.github.io](jenniNelson.github.io)
+Project website: [jenniNelson.github.io](http://jenniNelson.github.io)
 
 Demo Video: https://youtu.be/RQA8C236T8w
 
