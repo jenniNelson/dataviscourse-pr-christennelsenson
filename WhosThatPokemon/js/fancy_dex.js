@@ -235,7 +235,7 @@ class FancyDex {
                 ,
                 {title:"S.Def", field:"perc_sp_defense", align:"left", width:75, headerFilter:"number", headerFilterPlaceholder:"at least", headerFilterFunc:(h,r)=>(+h)*100/this.max_sp_defense<=r, formatter:"progress", formatterParams:{color:stat_bar_colors[4], legend:(x)=>"&nbsp;&nbsp;"+(x*this.max_sp_defense/100).toFixed(0), legendAlign:'left'}}
                 ,
-                {title:"Spd", field:"perc_speed", align:"left", width:75, headerFilter:"number", headerFilterPlaceholder:"at least", headerFilterFunc:(h,r)=>(+h)*100/this.max_speed<=r, ormatter:"progress", formatterParams:{color:stat_bar_colors[5], legend:(x)=>"&nbsp;&nbsp;"+(x*this.max_speed/100).toFixed(0), legendAlign:'left'}}
+                {title:"Spd", field:"perc_speed", align:"left", width:75, headerFilter:"number", headerFilterPlaceholder:"at least", headerFilterFunc:(h,r)=>(+h)*100/this.max_speed<=r, formatter:"progress", formatterParams:{color:stat_bar_colors[5], legend:(x)=>"&nbsp;&nbsp;"+(x*this.max_speed/100).toFixed(0), legendAlign:'left'}}
                 ,
                 {title:"T1", field:"type1", width:57, formatter:type_formatter}
                 ,
