@@ -2,6 +2,7 @@
 #### Matthew Christensen and Jennifer Nelson
 ##### u0899251@utah.edu & u1060401@utah.edu
 
+NOTE: WORKS BEST IN CHROME
 
 ### Links:
 Project website: [jenniNelson.github.io](http://jenniNelson.github.io)
