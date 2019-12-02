@@ -148,13 +148,13 @@ class MapView {
                 text: "Kalos",
                 image: "data/map_data/Kalos_annotated.svg"
             }
-            // ,
-            // alola: {
-            //     tab_id: "alola_button",
-            //     map_id: "alola",
-            //     text: "Alola",
-            //     image: "data/map_data/Alola.png"
-            // }
+            ,
+            alola: {
+                tab_id: "alola_button",
+                map_id: "alola",
+                text: "Alola",
+                image: "data/map_data/Alola_annotated.svg"
+            }
             };
         d3.select("#map_area").select(".tab").selectAll("button")
             .data(Object.values(gen_list))
