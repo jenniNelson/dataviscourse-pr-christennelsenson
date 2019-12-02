@@ -2,6 +2,8 @@ class Matchups{
     constructor(pokemon, card_manager) {
 
         let that = this;
+
+        //callback function to update other parts of the page
         function update_pokemon(cat, pos, mon){
             if(mon !== undefined){
                 console.log(cat, pos, mon);
@@ -10,19 +12,24 @@ class Matchups{
             }
             // that.initialize_cards();
         }
+
+        //register our callback function to the site manager object
         this.card_manager = card_manager;
         this.card_manager.add_callback(update_pokemon);
 
+        //Dictionary from long_id to Pokemon
         this.poke_dict = pokemon;
+
+        //Array containing just the Pokemon
         this.mons = Object.values(pokemon).sort((a,b)=>+a.long_id - +b.long_id);
         this.mons.push(missingno);
-        console.log(this.mons)
 
         this.current_view = "team";
 
         this.num_vs = 2;
         this.num_team = 6;
 
+        //Map of color schemes for different types
         this.type_colors = {
             "fire" : ["#ff4f4a","#9b1414"],
             "water" : ["#6765ff","#3b3e9b"],
@@ -45,6 +52,7 @@ class Matchups{
             "missing" : ["#505050", "#0c0c0c"]
         };
 
+        //array of colors for each different stat
         this.stat_bar_colors = [
             "#ff4f4a",
             "#ff9529",
@@ -54,6 +62,7 @@ class Matchups{
             "#ff77e8"
         ];
 
+        //Scales for charts
         this.stat_scale =d3.scaleLinear().domain([0,250]).range([0,250]);
         this.reverse_stat_scale = d3.scaleLinear().domain([0,250]).range([0,-375]);
         this.reverse_stat_axis = d3.axisLeft(this.reverse_stat_scale).tickSize(345).ticks(5);
@@ -61,12 +70,13 @@ class Matchups{
 
         this.hp_bar_scale = d3.scaleLinear().domain([0,1]).range([0,300]);
 
+        //initialize components of each view.
         this.initialize_tabs();
         this.fill_dropdowns();
         this.initialize_cards();
         this.initialize_summaries();
     }
-
+    
     initialize_tabs() {
         let that = this;
         d3.selectAll("#view_switcher .tablinks").data(["vs", "team"])
@@ -75,6 +85,7 @@ class Matchups{
             .classed("active", true);
     }
 
+    //When the user clicks between tabs, the view should change between vs and team view.
     switch_tabs(name) {
         if(name === this.current_view)
             return
@@ -101,18 +112,17 @@ class Matchups{
                 .classed("hidden", false);
             this.current_view = "team"
         }
-
     }
 
+    //Fill every dropdown menu in both vs and team views
     fill_dropdowns() {
         let that = this;
         for (let j = 0; j < this.num_vs; j++) {
             let pane = d3.select("#vs_" + j);
 
+            //When the dropdowns change, it should trigger changes throughout the page
             $("#vs_dd_"+j).select2().on("select2:select", function(evt) {
                 let mon = d3.select(evt.params.data.element).datum();
-                // that.card_manager.vs[j] = mon.long_id
-                // that.draw_card(mon.long_id, "#vs_svg_" + j);
                 that.card_manager.update_vs(j, mon.long_id)
             });
 
@@ -122,6 +132,7 @@ class Matchups{
                 .attr("value", d=>d.long_id)
                 .text( d => (d.long_id === "whodat")?"(No Selection)":(d.name + " (#" + d.long_id + ")"));
 
+            //This probably should be elsewhere, but it works.
             pane.append("svg")
                 .attr("id", "vs_svg_" + j)
                 .attr("width", 430)
@@ -133,9 +144,6 @@ class Matchups{
 
             $("#tb_dd_"+j).select2().on("select2:select", function(evt) {
                 let mon = d3.select(evt.params.data.element).datum();
-                // that.card_manager.team[j] = mon.long_id;
-                // that.draw_card(mon.long_id, "#tb_svg_" + j);
-
                 that.card_manager.update_team(j, mon.long_id)
             });
 
@@ -151,6 +159,8 @@ class Matchups{
         }
     }
 
+    //initialize both cards in vs, and all 6 cards in team builder
+    // The initial pokemon selected are determined by the card manager object.
     initialize_cards() {
         for (let j = 0; j<this.num_vs; j++) {
             let mon = this.poke_dict[this.card_manager.vs[j]];
@@ -166,6 +176,7 @@ class Matchups{
         }
     }
 
+    //Part of the method passed into our callback manager.
     update_card(cat, pos, mon_id) {
         let dd_id = ((cat==="vs")?"#vs_dd_":"#tb_dd_") + pos;
         let svg_id = ((cat==="vs")?"#vs_svg_":"#tb_svg_") + pos;
@@ -176,6 +187,7 @@ class Matchups{
         this.draw_card(mon_id, svg_id);
     }
 
+    //The first of two meaty methods. Fills in a card with all information about a Pokemon.
     draw_card(id, svg_id) {
 
         let stat_labels = ["hp","atk","def","s.a.", "s.d.", "spd"];
@@ -373,6 +385,7 @@ class Matchups{
         }
     }
 
+    //Sets up the summary sections at the bottom of vs and tb views.
     initialize_summaries() {
 
         d3.select("#matchup_summary").append("svg")
@@ -390,7 +403,7 @@ class Matchups{
         this.draw_team_summary();
     }
 
-
+    //Part of the method passed into our callback manager.
     update_summary(category) {
         if (category === "vs") {
             this.draw_vs_summary();
@@ -400,6 +413,7 @@ class Matchups{
 
     }
 
+    //display information on what Pokemon would win in a fight.
     draw_vs_summary() {
 
         let mons =[];
@@ -490,6 +504,7 @@ class Matchups{
         }
     }
 
+    //helper method to evaluate who wins and how they won
     draw_winner(group, left_to_faint, right_to_faint, lpref, rpref) {
         let left = this.poke_dict[this.card_manager.vs[0]];
         let right = this.poke_dict[this.card_manager.vs[1]];
@@ -526,6 +541,7 @@ class Matchups{
 
     }
 
+    //helper to evaluate which pokemon is faster
     draw_speed_arrow(group, left, right, x, y) {
         if(left.speed > right.speed) {
             group.append("g").attr("transform", "translate("+(x+10)+","+y+")").append("path")
@@ -576,6 +592,7 @@ class Matchups{
         }
     }
 
+    //helper to evaluate how much health a pokemon has left.
     draw_hp_bar(group, percentage, x, y, is_phys, mon) {
         let base = group.append("g").attr("transform", "translate(" + x +","+y+")");
         base.append("rect").attr("x", 0).attr("y", 0).attr("width", 300).attr("height", 20)
@@ -591,6 +608,7 @@ class Matchups{
 
     }
 
+    //Draw the type matchup info and statistical analysis of a team.
     draw_team_summary() {
         let mons = [];
         for(let i =0; i < 6; i++) {
@@ -762,11 +780,12 @@ class Matchups{
             .text("Types Strong Against This Team:");
 
     }
-
-
 }
 
+//-----------------Pokemon information helper methods------------------
 
+
+//Given a set of pokemon, return a set of what types are covered, uncovered, and what types that team is weak to.
 function get_type_coverage(mons) {
     if(mons.length === 0) {
         return {covered: [], uncovered:[], weak_to: []}
@@ -786,6 +805,7 @@ function get_type_coverage(mons) {
     return {covered: covered, uncovered: uncovered, weak_to: weak_to}
 }
 
+//Find the types that this team is weak to.
 function team_weak_to(mons, type) {
     let total = 0;
     for (let mon of mons) {
@@ -798,6 +818,7 @@ function team_weak_to(mons, type) {
     }
 }
 
+//Find the types that at least one member of the team is strong against.
 function team_can_cover(mons, type) {
     for (let mon of mons) {
         if(can_cover(mon, type))
@@ -806,6 +827,7 @@ function team_can_cover(mons, type) {
     return false
 }
 
+//Determines if an individual pokemon is weak to a particular type
 function is_weak_to(mon, type) {
     let idx1 = types_to_idx[mon.type1];
     let atkidx = types_to_idx[type];
@@ -817,6 +839,7 @@ function is_weak_to(mon, type) {
     }
 }
 
+//Determines if an individual pokemon is strong against a particular type
 function can_cover(mon, type) {
     let idx1 = types_to_idx[mon.type1];
     let defidx = types_to_idx[type];
@@ -828,11 +851,13 @@ function can_cover(mon, type) {
     }
 }
 
+//Returns the numerical HP total a pokemon has at a given level (using a slightly simplified game equation)
 function hp_stat(mon, level) {
     console.log(mon);
     return Math.floor((2*mon.hp + 15)*level/100) + level + 10
 }
 
+//Calculate damage that one pokemon deals to another
 function damage(attack_mon, receive_mon, is_special, level, power) {
 
     let topleft = 2*level/5 + 2;
@@ -843,6 +868,7 @@ function damage(attack_mon, receive_mon, is_special, level, power) {
 
 }
 
+//Calculate the numerical ratio between an attacker and defenders attack and defense stats respectively.
 function a_d_ratio(attacker, defender, spec, lvl) {
     let attack, defense;
     if(spec) {
@@ -855,10 +881,12 @@ function a_d_ratio(attacker, defender, spec, lvl) {
     return attack / defense;
 }
 
+//general formula for calculating a base stat (Besides hp)
 function stat(base, level=50) {
     return (2*base+15)*level/100 + 5
 }
 
+//Returns the multiplier an attack would have given the two pokemon's types
 function type_modifier(attacker, defender) {
     let atk_1 = types_to_idx[attacker.type1];
     let def_1 = types_to_idx[defender.type1];
@@ -888,7 +916,7 @@ function type_modifier(attacker, defender) {
     }
 }
 
-
+//lets me map a type string into a number
 let types_to_idx = {
     "normal":0,
     "fire":1,
@@ -910,6 +938,7 @@ let types_to_idx = {
     "fairy":17
 };
 
+//lets me map a number into a type string
 let idx_to_types = [
     "normal",
     "fire",
@@ -931,6 +960,7 @@ let idx_to_types = [
     "fairy"
 ];
 
+//multipliers of all type matchups, accessible using numbered types.
 let matchups = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, .5, 0, 1, 1, .5, 1],
     [1, .5, .5, 2, 1, 2, 1, 1, 1, 1, 1, 2, .5, 1, .5, 1, 2, 1],
@@ -952,6 +982,7 @@ let matchups = [
     [1, .5, 1, 1, 1, 1, 2, .5, 1, 1, 1, 1, 1, 1, 2, 2, .5, 1]
 ];
 
+//A blank pokemon, meant to represent no selection.
 let missingno = {
                 name: "(no selection)",
                 type1 : "missing",
