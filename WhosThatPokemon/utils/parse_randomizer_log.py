@@ -48,6 +48,7 @@ class Pokemon:
         self.weight = weight
 
         self.ev_from = []
+        self.ev_from_as_ids = []
         self.is_base_evol = True
         self.is_full_evol = True
         self.full_evol_family = None # Don't really need this
@@ -107,12 +108,18 @@ def get_location_from_match(match):
 
     return PokeSpot(place_num, place, method, rate, mons)
 
+# Give every pokemon its list of evolves-from and evolves-to
 def translate_evol_data(evolutions: defaultdict, pokedex : dict):
     for evolver, evolvees in evolutions.items():
         pokedex[evolver].to_list = evolvees
         pokedex[evolver].to_list_as_ids = [pokedex[v].id for v in evolvees]
         for v in evolvees:
-            pokedex[v].
+            pokedex[v].ev_from.append(evolver)
+            pokedex[v].ev_from_as_ids.append(pokedex[evolver].id)
+
+# def translate_loc_data(locations: defaultdict, pokedex:dict):
+#     for locname, mons in locations.items():
+#         mon.locations +=
 
 
 def parse_log(logfilename):
@@ -182,4 +189,7 @@ def parse_log(logfilename):
 
         ### Translate into our data formats ###
 
-        translate_evol_data()
+        translate_evol_data(evolutions, pokedex)
+        # trannslate_loc_data(locations, pokedex)
+
+
