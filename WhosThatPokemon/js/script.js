@@ -9,9 +9,11 @@ loadData().then(poke_dict => {
     let matchupview = new Matchups(poke_dict, card_manager);
     let mapview = new MapView(poke_dict, card_manager);
 
-    let dataLoader = new DataLoader(poke_dict, card_manager);
 
     let fancydex = new FancyDex(poke_dict, card_manager);
+
+
+    let dataLoader = new DataLoader(poke_dict, card_manager);
 
     card_manager.update_objects();
 
@@ -238,6 +240,14 @@ class Pokemon{
                     place_id : place.replace(/\"/g, "").replace(/ /g, '_').replace(/\.|'/g, '')
                 };
         }); //list of location strings
+    }
+
+    getStat(stat, is_rando) {
+        if(!is_rando) {
+            return this[stat]
+        } else {
+            return 0;
+        }
     }
 
 }
