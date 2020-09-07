@@ -56,7 +56,9 @@ class CardManager{
             queue: [0,1,2,3,4,5]
         };
 
-        this.callbacks = []
+        this.callbacks = [];
+
+        this.rando_mode = false;
 
 
     }

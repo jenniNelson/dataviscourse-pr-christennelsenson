@@ -76,7 +76,7 @@ class Matchups{
         this.initialize_cards();
         this.initialize_summaries();
     }
-    
+
     initialize_tabs() {
         let that = this;
         d3.selectAll("#view_switcher .tablinks").data(["vs", "team"])
@@ -88,7 +88,7 @@ class Matchups{
     //When the user clicks between tabs, the view should change between vs and team view.
     switch_tabs(name) {
         if(name === this.current_view)
-            return
+            return;
         d3.selectAll(".lef_table")
             .classed("hidden", true);
         d3.selectAll("#view_switcher .tablinks")
@@ -779,6 +779,15 @@ class Matchups{
             .style("font-size", "14pt")
             .text("Types Strong Against This Team:");
 
+    }
+
+    refresh_panes() {
+        //update every card
+        this.initialize_cards();
+
+        this.update_summary("vs");
+        this.update_summary("team");
+        //TODO update third tab
     }
 }
 
