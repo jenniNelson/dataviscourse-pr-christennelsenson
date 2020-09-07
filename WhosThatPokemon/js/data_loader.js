@@ -40,8 +40,8 @@ class DataLoader {
         var reader = new FileReader();
         reader.onload = function(progressEvent){
 
-            let stats_re = /(?<id>\d{1,3})\|\s*?(?<name>[A-Z]*?)\s*?\|\s*?(?<type1>[A-Z]*?)(?:\s*?\/\s*?(?<type2>[A-Z]*?))?\s*?\|\s*?(?<hp>\d*?)\s*?\|\s*?(?<atk>\d*?)\s*?\|\s*?(?<def>\d*?)\s*?\|\s*?(?<spe>\d*?)\s*?\|\s*?(?<satk>\d*?)\s*?\|\s*?(?<sdef>\d*?)\s*?\|\s*?(?<ability1>.*?)\s*?\|\s*?(?<ability2>.*?)\s*?\|\s*?(?<item>.*?)\n/;
-            let evolves_re = /(?<from>[A-Z]*?) now evolves into (?<togroup>[A-Z, \d:]*)(?:and (?<lastto>[A-Z, \d:]*))?/;
+            let stats_re = /(?<id>\d{1,3})\|\s*?(?<name>.*?)\s*?\|\s*?(?<type1>[A-Z]*?)(?:\s*?\/\s*?(?<type2>[A-Z]*?))?\s*?\|\s*?(?<hp>\d*?)\s*?\|\s*?(?<atk>\d*?)\s*?\|\s*?(?<def>\d*?)\s*?\|\s*?(?<spe>\d*?)\s*?\|\s*?(?<satk>\d*?)\s*?\|\s*?(?<sdef>\d*?)\s*?\|\s*?(?<ability1>.*?)\s*?\|\s*?(?<ability2>.*?)\s*?\|\s*?(?<item>.*?)/;
+            // let evolves_re = /(?<from>[A-Z]*?) now evolves into (?<togroup>[A-Z, \d:]*)(?:and (?<lastto>[A-Z, \d:]*))?/;
 
             let soulsilver_locs = 'Route \d\d?|New Bark Town|Cherrygrove City|Violet City|Sprout Tower|Ruins of Alph|Union Cave|SLOWPOKE|Ilex Forest|National Park|Ecruteak City|Burned Tower|Bell Tower|Olivine City|Whirl Islands|Cianwood City|Mt\. Mortar|Ice Path|Blackthorn City|Dragon’s Den|Dark Cave|Seafoam Islands|Mt\. Silver Cave|Cliff Edge Gat|Cliff Cave|Bell Tower|Mt\. Silver|Safari Zone|Pallet Town|Viridian City|Cerulean City|Vermilion City|Celadon City|Fuchsia City|Cinnabar Island|Mt\. Moon|Rock Tunnel|Victory Road|Tohjo Falls|DIGLETT’s Cave|Victory Road|Viridian Forest|Cerulean Cave|Bug Catching Contest'
 
@@ -88,15 +88,21 @@ class DataLoader {
                         // pokedex[pokemon.name] = pokemon;
                     }
                 }
+                // else if (mode === "stats"){
+                //     that.add_rando_stats_to_pokemon_from_line(line);
+                // }
 
+                // else if (mode === "evolutions"){
+                //     let match = evolves_re.exec(line);
+                //     if (match){
+                //         let links = that.make_evolution_links_from_re_match(match);
+                //         // for (let link in links){
+                //         //     evolutions[link[0]].append(link[1]);
+                //         // }
+                //     }
+                // }
                 else if (mode === "evolutions"){
-                    let match = evolves_re.exec(line);
-                    if (match){
-                        let links = that.make_evolution_links_from_re_match(match);
-                        // for (let link in links){
-                        //     evolutions[link[0]].append(link[1]);
-                        // }
-                    }
+                    that.make_evolution_links_from_line(line);
                 }
 
                 // else if (mode === "locations"){
@@ -154,6 +160,25 @@ class DataLoader {
 
 
         let start_mon = Object.values(this.poke_dict).find(x => x.name.toLowerCase() === start.toLowerCase());
+        start_mon.rand_ev_to = to_ids;
+        for (let to_id of to_ids) {
+            if (this.poke_dict[to_id].rand_ev_froms) {
+                this.poke_dict[to_id].rand_ev_froms.push(start_mon.long_id);
+            } else {
+                this.poke_dict[to_id].rand_ev_froms = [start_mon.long_id];
+            }
+        }
+    }
+
+
+    make_evolution_links_from_line(line) {
+        let namelist = line.split(/ now evolves into |, | and /);
+        let start = namelist[0];
+        let to = namelist.slice(1);
+        let to_ids = to.map(t => Object.values(this.poke_dict).find(x => x.name.toLowerCase().replace(/[\u2019']/,"") === t.toLowerCase().replace(/[\u2019']/,"")).long_id);
+
+
+        let start_mon = Object.values(this.poke_dict).find(x => x.name.toLowerCase().replace(/[\u2019']/,"") === start.toLowerCase().replace(/[\u2019']/,""));
         start_mon.rand_ev_to = to_ids;
         for (let to_id of to_ids) {
             if (this.poke_dict[to_id].rand_ev_froms) {
