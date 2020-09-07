@@ -2,12 +2,14 @@
 
 loadData().then(poke_dict => {
 
-    console.log(poke_dict)
+    console.log(poke_dict);
 
     let card_manager = new CardManager();
     // let pokedex = new Pokedex(poke_dict, card_manager);
     let matchupview = new Matchups(poke_dict, card_manager);
     let mapview = new MapView(poke_dict, card_manager);
+
+    let dataLoader = new DataLoader(poke_dict, card_manager);
 
     let fancydex = new FancyDex(poke_dict, card_manager);
 
@@ -55,6 +57,8 @@ class CardManager{
         };
 
         this.callbacks = []
+
+
     }
 
     /** Add a callback for this class to call when a change is made to a selection **/
