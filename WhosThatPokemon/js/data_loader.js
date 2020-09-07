@@ -146,7 +146,7 @@ class DataLoader {
         if (lastto) {
             to.append(lastto);
         }
-        let to_ids = to.map(t => this.poke_dict.values().find(x => x.name.lower() === t.lower()).long_id;
+        let to_ids = to.map(t => this.poke_dict.values().find(x => x.name.lower() === t.lower()).long_id);
 
         let start_mon = this.poke_dict.values().find(x => x.name.lower() === start.lower());
         start_mon.rand_ev_to = to_ids;
