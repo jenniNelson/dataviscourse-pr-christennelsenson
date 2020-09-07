@@ -236,6 +236,21 @@ class Pokemon{
                     place_id : place.replace(/\"/g, "").replace(/ /g, '_').replace(/\.|'/g, '')
                 };
         }); //list of location strings
+
+
+        this.rand_type1 = null;
+        this.rand_type2 = null;
+        this.rand_hp = null;
+        this.rand_attack = null;
+        this.rand_defense = null;
+        this.rand_special = null;
+        this.rand_sp_attack = null;
+        this.rand_sp_defense = null;
+        this.rand_ability1 = null;
+        this.rand_ability2 = null;
+        this.rand_item = null;
+        this.rand_ev_froms = null;
+        this.is_randomized = false;
     }
 
 }
