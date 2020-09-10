@@ -12,22 +12,22 @@ class FancyDex {
 
     constructor(pokemon, card_manager) {
         let that = this;
-        let checked_anything = function(data){
+        let checked_anything = function (data) {
             let sum = 0;
-            for(let v of Object.values(data.vs)){
-                sum += v? 1:0
+            for (let v of Object.values(data.vs)) {
+                sum += v ? 1 : 0
             }
-            for(let v of Object.values(data.team)){
-                sum += v? 1:0
+            for (let v of Object.values(data.team)) {
+                sum += v ? 1 : 0
             }
             return sum > 0
         };
 
-        let update_selected = function(){
+        let update_selected = function () {
             // Only change that which might need unchecking, and that which might need checking
             let selected = that.fancydex.searchData(checked_anything)
-                .concat(that.fancydex.searchData("long_id", "in", Object.values(card_manager.team) ),
-                    that.fancydex.searchData("long_id", "in", Object.values(card_manager.vs) ));
+                .concat(that.fancydex.searchData("long_id", "in", Object.values(card_manager.team)),
+                    that.fancydex.searchData("long_id", "in", Object.values(card_manager.vs)));
 
             for (let select of selected) {
                 let team = {};
@@ -41,13 +41,20 @@ class FancyDex {
                 }])
             }
 
-        }
+        };
 
         this.card_manager = card_manager;
         this.card_manager.add_callback(update_selected);
         // this.pokemon = pokemon;
 
-        pokemon = Object.values(pokemon)
+        this.set_pokemon_data(pokemon);
+
+
+        this.initialize_table();
+    }
+
+    set_pokemon_data(pokemon_dict){
+        let pokemon = Object.values(pokemon_dict);
         this.max_stat_total = d3.max(pokemon.map(p => p.stat_total));
         this.max_hp = d3.max(pokemon.map(p=>p.hp));
         this.max_attack = d3.max(pokemon.map(p=>p.attack));
@@ -100,11 +107,12 @@ class FancyDex {
             };
             return newp;
         });
-
         console.log(this.pokemon)
+    }
 
 
-        this.initialize_table();
+    update_post_randomize(){
+
     }
 
 
