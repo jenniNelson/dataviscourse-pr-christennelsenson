@@ -205,13 +205,13 @@ class Matchups{
             .attr("height", 220)
             .attr("width", 420)
             .attr("rx", 10)
-            .attr("fill", this.type_colors[mon.type1][0]);
+            .attr("fill", this.type_colors[mon.getType()[0]][0]);
 
         pallet.append("circle")
             .attr("cx", 60)
             .attr("cy", 60)
             .attr("r", 50)
-            .attr("fill", this.type_colors[mon.type1][1]);
+            .attr("fill", this.type_colors[mon.getType()[0]][1]);
 
         pallet.append("image")
             .attr("href","data/pokemon_data/sprites/" + mon.long_id + ".png")
@@ -230,13 +230,13 @@ class Matchups{
             .attr("height", 130)
             .attr('rx', 10)
             .attr("fill", "#fff8d6")
-            .attr("stroke", this.type_colors[mon.type1][1])
+            .attr("stroke", this.type_colors[mon.getType()[0]][1])
             .attr("stroke-width", "3pt");
 
         let chart_group = bar_group.append("g")
             .attr("transform", "translate(10, 7)");
 
-        chart_group.selectAll("rect").data([mon.hp, mon.attack, mon.defense, mon.sp_attack, mon.sp_defense, mon.speed])
+        chart_group.selectAll("rect").data(mon.getStats())//[mon.hp, mon.attack, mon.defense, mon.sp_attack, mon.sp_defense, mon.speed])
             .join("rect")
             .attr("x", 20)
             .attr("y", (d,i) => 17*i)
@@ -245,7 +245,8 @@ class Matchups{
             .attr("fill", (d,i) => this.stat_bar_colors[i]);
 
         chart_group.append("g")
-            .selectAll("text").data([mon.hp, mon.attack, mon.defense, mon.sp_attack, mon.sp_defense, mon.speed]).join("text")
+            .selectAll("text").data(mon.getStats())//[mon.hp, mon.attack, mon.defense, mon.sp_attack, mon.sp_defense, mon.speed]).join("text")
+            .join("text")
             .text(d => d)
             .attr("x", 23)
             .attr("y", (d,i)=>12 + 17*i);
@@ -264,7 +265,7 @@ class Matchups{
             .attr("y", 135)
             .style("font-weight", "bold")
             .style("font-size", "12px")
-            .text("TOTAL STATS: " + mon.stat_total);
+            .text("TOTAL STATS: " + mon.getStatTotal());
 
         let info_group = pallet.append("g")
             .attr("transform", "translate(10, 120)");
@@ -276,7 +277,7 @@ class Matchups{
         info_group.append("text")
             .attr("x", 0)
             .attr("y", 13)
-            .text(((mon.type2 !== '') && (mon.type1 !== mon.type2) ?mon.type1 +' & '+ mon.type2 :mon.type1))
+            .text(((mon.getType()[1] !== '') && (mon.getType()[0] !== mon.getType()[1]) ?mon.getType()[0] +' & '+ mon.getType()[1] :mon.getType()[0]))
             .style("font-size", "11pt");
 
 
@@ -324,7 +325,7 @@ class Matchups{
                 .attr("cx", 10)
                 .attr("cy", 25)
                 .attr("r", 20)
-                .attr("fill", this.type_colors[mon.type1][1]);
+                .attr("fill", this.type_colors[mon.getType()[0]][1]);
 
 
             prev_group.append("image")
@@ -362,7 +363,7 @@ class Matchups{
                 .attr("cx", 20)
                 .attr("cy", 15)
                 .attr("r", 20)
-                .attr("fill", this.type_colors[mon.type1][1]);
+                .attr("fill", this.type_colors[mon.getType()[0]][1]);
             let that=this;
             groups.append("image")
                 .attr("href", d => "data/pokemon_data/sprites/" + d + ".png")
@@ -666,12 +667,12 @@ class Matchups{
         let mon_groups = mark_group.selectAll("g").data(mons).join("g");
 
         mon_groups.selectAll("line").data((d,i) => [
-            {name:d.name,stat:d.hp,         stat2:d.attack,         type:d.type1, index: i},
-            {name:d.name,stat:d.attack,     stat2:d.defense,     type:d.type1, index: i},
-            {name:d.name,stat:d.defense,    stat2:d.sp_attack,    type:d.type1, index: i},
-            {name:d.name,stat:d.sp_attack,  stat2:d.sp_defense,  type:d.type1, index: i},
-            {name:d.name,stat:d.sp_defense, stat2:d.speed, type:d.type1, index: i},
-            {name:d.name,stat:d.speed,      stat2:d.speed,      type:d.type1, index: i}
+            {name:d.name,stat:d.hp,         stat2:d.attack,         type:d.getType()[0], index: i},
+            {name:d.name,stat:d.attack,     stat2:d.defense,     type:d.getType()[0], index: i},
+            {name:d.name,stat:d.defense,    stat2:d.sp_attack,    type:d.getType()[0], index: i},
+            {name:d.name,stat:d.sp_attack,  stat2:d.sp_defense,  type:d.getType()[0], index: i},
+            {name:d.name,stat:d.sp_defense, stat2:d.speed, type:d.getType()[0], index: i},
+            {name:d.name,stat:d.speed,      stat2:d.speed,      type:d.getType()[0], index: i}
         ]).join("line")
             .attr("class" , d=> "l_" + d.index)
             .style("opacity", 0)
@@ -683,12 +684,12 @@ class Matchups{
             .attr("stroke-width", 2);
 
         mon_groups.selectAll("ellipse").data((d,i)=>[
-            {name:d.name,stat:d.hp,type:d.type1, index: i},
-            {name:d.name,stat:d.attack,type:d.type1, index: i},
-            {name:d.name,stat:d.defense,type:d.type1, index: i},
-            {name:d.name,stat:d.sp_attack,type:d.type1, index: i},
-            {name:d.name,stat:d.sp_defense,type:d.type1, index: i},
-            {name:d.name,stat:d.speed,type:d.type1, index: i}
+            {name:d.name,stat:d.hp,type:d.getType()[0], index: i},
+            {name:d.name,stat:d.attack,type:d.getType()[0], index: i},
+            {name:d.name,stat:d.defense,type:d.getType()[0], index: i},
+            {name:d.name,stat:d.sp_attack,type:d.getType()[0], index: i},
+            {name:d.name,stat:d.sp_defense,type:d.getType()[0], index: i},
+            {name:d.name,stat:d.speed,type:d.getType()[0], index: i}
             ]).join("ellipse")
                 .attr("cx", (d,i) => 60*i)
                 .attr("cy", d => this.reverse_stat_scale(d.stat))
@@ -838,10 +839,10 @@ function team_can_cover(mons, type) {
 
 //Determines if an individual pokemon is weak to a particular type
 function is_weak_to(mon, type) {
-    let idx1 = types_to_idx[mon.type1];
+    let idx1 = types_to_idx[mon.getType()[0]];
     let atkidx = types_to_idx[type];
-    if(mon.type2 !== '' && mon.type2 !== mon.type1) {
-        let idx2 = types_to_idx[mon.type2];
+    if(mon.getType()[1] !== '' && mon.getType()[1] !== mon.getType()[0]) {
+        let idx2 = types_to_idx[mon.getType()[1]];
         return matchups[atkidx][idx1] * matchups[atkidx][idx2] > 1
     } else {
         return matchups[atkidx][idx1] > 1
@@ -850,10 +851,10 @@ function is_weak_to(mon, type) {
 
 //Determines if an individual pokemon is strong against a particular type
 function can_cover(mon, type) {
-    let idx1 = types_to_idx[mon.type1];
+    let idx1 = types_to_idx[mon.getType()[0]];
     let defidx = types_to_idx[type];
-    if(mon.type2 !== '' && mon.type2 !== mon.type1) {
-        let idx2 = types_to_idx[mon.type2];
+    if(mon.getType()[1] !== '' && mon.getType()[1] !== mon.getType()[0]) {
+        let idx2 = types_to_idx[mon.getType()[1]];
         return Math.max(matchups[idx1][defidx] , matchups[idx2][defidx]) > 1
     } else {
         return matchups[idx1][defidx] > 1
@@ -897,14 +898,14 @@ function stat(base, level=50) {
 
 //Returns the multiplier an attack would have given the two pokemon's types
 function type_modifier(attacker, defender) {
-    let atk_1 = types_to_idx[attacker.type1];
-    let def_1 = types_to_idx[defender.type1];
+    let atk_1 = types_to_idx[attacker.getType()[0]];
+    let def_1 = types_to_idx[defender.getType()[0]];
 
-    if(attacker.type2 !== '' && attacker.type2 !== attacker.type1) {
-        let atk_2 = types_to_idx[attacker.type2];
+    if(attacker.getType()[1] !== '' && attacker.getType()[1] !== attacker.getType()[0]) {
+        let atk_2 = types_to_idx[attacker.getType()[1]];
 
-        if(defender.type2 !== '' && defender.type2 !== defender.type1) {
-            let def_2 = types_to_idx[defender.type2];
+        if(defender.getType()[1] !== '' && defender.getType()[1] !== defender.getType()[0]) {
+            let def_2 = types_to_idx[defender.getType()[1]];
             return Math.max(
                 matchups[atk_1][def_1]*matchups[atk_1][def_2],
                 matchups[atk_2][def_1]*matchups[atk_2][def_2]
@@ -916,8 +917,8 @@ function type_modifier(attacker, defender) {
             )
         }
     } else {
-        if(defender.type2 !== '' && defender.type2 !== defender.type1) {
-            let def_2 = types_to_idx[defender.type2];
+        if(defender.getType()[1] !== '' && defender.getType()[1] !== defender.getType()[0]) {
+            let def_2 = types_to_idx[defender.getType()[1]];
             return matchups[atk_1][def_1]*matchups[atk_1][def_2]
         } else {
             return matchups[atk_1][def_1]
