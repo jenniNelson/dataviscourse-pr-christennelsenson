@@ -519,11 +519,11 @@ class Matchups{
             turns_to_end = left_to_faint;
             strat = rpref;
         } else {
-            if(left.speed > right.speed) {
+            if(left.getStat('speed') > right.getStat('speed')) {
                 winner = left;
                 turns_to_end = right_to_faint;
                 strat = lpref;
-            } else if (right.speed > left.speed) {
+            } else if (right.getStat('speed') > left.getStat('speed')) {
                 winner = right;
                 turns_to_end = left_to_faint;
                 strat = rpref;
@@ -544,7 +544,7 @@ class Matchups{
 
     //helper to evaluate which pokemon is faster
     draw_speed_arrow(group, left, right, x, y) {
-        if(left.speed > right.speed) {
+        if(left.getStat('speed') > right.getStat('speed')) {
             group.append("g").attr("transform", "translate("+(x+10)+","+y+")").append("path")
                 .attr("fill", "#fff240")
                 .attr("d",`
@@ -563,7 +563,7 @@ class Matchups{
                 .style("text-anchor", "middle")
                 .style("font-size", "7pt")
                 .text("GOES FIRST")
-        } else if (right.speed > left.speed) {
+        } else if (right.getStat('speed') > left.getStat('speed')) {
             group.append("g").attr("transform", "translate("+(x - 10)+","+y+")").append("path")
                 .attr("fill", "#fff240")
                 .attr("d",`
@@ -667,12 +667,12 @@ class Matchups{
         let mon_groups = mark_group.selectAll("g").data(mons).join("g");
 
         mon_groups.selectAll("line").data((d,i) => [
-            {name:d.name,stat:d.hp,         stat2:d.attack,         type:d.getType()[0], index: i},
-            {name:d.name,stat:d.attack,     stat2:d.defense,     type:d.getType()[0], index: i},
-            {name:d.name,stat:d.defense,    stat2:d.sp_attack,    type:d.getType()[0], index: i},
-            {name:d.name,stat:d.sp_attack,  stat2:d.sp_defense,  type:d.getType()[0], index: i},
-            {name:d.name,stat:d.sp_defense, stat2:d.speed, type:d.getType()[0], index: i},
-            {name:d.name,stat:d.speed,      stat2:d.speed,      type:d.getType()[0], index: i}
+            {name:d.name,stat:d.getStat('hp'),         stat2:d.getStat('attack'),         type:d.getType()[0], index: i},
+            {name:d.name,stat:d.getStat('attack'),     stat2:d.getStat('defense'),     type:d.getType()[0], index: i},
+            {name:d.name,stat:d.getStat('defense'),    stat2:d.getStat('sp_attack'),    type:d.getType()[0], index: i},
+            {name:d.name,stat:d.getStat('sp_attack'),  stat2:d.getStat('sp_defense'),  type:d.getType()[0], index: i},
+            {name:d.name,stat:d.getStat('sp_defense'), stat2:d.getStat('speed'), type:d.getType()[0], index: i},
+            {name:d.name,stat:d.getStat('speed'),      stat2:d.getStat('speed'),      type:d.getType()[0], index: i}
         ]).join("line")
             .attr("class" , d=> "l_" + d.index)
             .style("opacity", 0)
@@ -684,12 +684,12 @@ class Matchups{
             .attr("stroke-width", 2);
 
         mon_groups.selectAll("ellipse").data((d,i)=>[
-            {name:d.name,stat:d.hp,type:d.getType()[0], index: i},
-            {name:d.name,stat:d.attack,type:d.getType()[0], index: i},
-            {name:d.name,stat:d.defense,type:d.getType()[0], index: i},
-            {name:d.name,stat:d.sp_attack,type:d.getType()[0], index: i},
-            {name:d.name,stat:d.sp_defense,type:d.getType()[0], index: i},
-            {name:d.name,stat:d.speed,type:d.getType()[0], index: i}
+            {name:d.name,stat:d.getStat('hp'),type:d.getType()[0], index: i},
+            {name:d.name,stat:d.getStat('attack'),type:d.getType()[0], index: i},
+            {name:d.name,stat:d.getStat('defense'),type:d.getType()[0], index: i},
+            {name:d.name,stat:d.getStat('sp_attack'),type:d.getType()[0], index: i},
+            {name:d.name,stat:d.getStat('sp_defense'),type:d.getType()[0], index: i},
+            {name:d.name,stat:d.getStat('speed'),type:d.getType()[0], index: i}
             ]).join("ellipse")
                 .attr("cx", (d,i) => 60*i)
                 .attr("cy", d => this.reverse_stat_scale(d.stat))
@@ -864,7 +864,7 @@ function can_cover(mon, type) {
 //Returns the numerical HP total a pokemon has at a given level (using a slightly simplified game equation)
 function hp_stat(mon, level) {
     console.log(mon);
-    return Math.floor((2*mon.hp + 15)*level/100) + level + 10
+    return Math.floor((2*mon.getStat('hp') + 15)*level/100) + level + 10
 }
 
 //Calculate damage that one pokemon deals to another
@@ -882,11 +882,11 @@ function damage(attack_mon, receive_mon, is_special, level, power) {
 function a_d_ratio(attacker, defender, spec, lvl) {
     let attack, defense;
     if(spec) {
-        attack = stat(attacker.sp_attack, lvl);
-        defense = stat(defender.sp_defense, lvl);
+        attack = stat(attacker.getStat('sp_attack'), lvl);
+        defense = stat(defender.getStat('sp_defense'), lvl);
     } else {
-        attack = stat(attacker.attack, lvl);
-        defense = stat(defender.defense, lvl);
+        attack = stat(attacker.getStat('attack'), lvl);
+        defense = stat(defender.getStat('defense'), lvl);
     }
     return attack / defense;
 }
