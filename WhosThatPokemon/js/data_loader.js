@@ -14,12 +14,14 @@ function long_id_from_id(id){
 
 class DataLoader {
 
-    constructor(poke_dict, card_manager) {
+    constructor(poke_dict, card_manager, matchup_panel, list_panel) {
         let that = this;
         this.uploader_button = document.getElementById("file_selector");
         this.uploader_button.addEventListener("change", ev => this.read_new_log(ev.target.files[0]));
         this.poke_dict = poke_dict;
         this.card_manager = card_manager;
+        this.list_panel = list_panel;
+        this.matchup_panel = matchup_panel;
 
     }
 
@@ -31,11 +33,13 @@ class DataLoader {
         console.log(file);
 
         // this.dex["002"].attack = 200;
-        // this.poke_dict["002"].attack = 200;
+        this.poke_dict["002"].attack = 200;
 
         this.parse_log(file);
 
-        console.log(this.poke_dict)
+        //console.log(this.poke_dict);
+
+        //this.list_panel.refresh();
 
     }
 
@@ -119,6 +123,8 @@ class DataLoader {
 
 
             }
+
+            that.matchup_panel.refresh_panes();
         };
         reader.readAsText(file);
 
@@ -129,12 +135,12 @@ class DataLoader {
         let poke = this.poke_dict[long_id_from_id(match.groups.id)];
         console.log(long_id_from_id(match.groups.id), poke);
 
-        poke.rand_type1 = match.groups['type1'];
-        poke.rand_type2 = match.groups['type2'];
+        poke.rand_type1 = match.groups['type1'].toLowerCase();
+        poke.rand_type2 = match.groups['type2'] ? match.groups['type2'].toLowerCase() : "" ;
         poke.rand_hp = parseInt(match.groups['hp']);
         poke.rand_attack = parseInt(match.groups['atk']);
         poke.rand_defense = parseInt(match.groups['def']);
-        poke.rand_special = parseInt(match.groups['spe']);
+        poke.rand_speed = parseInt(match.groups['spe']);
         poke.rand_sp_attack = parseInt(match.groups['satk']);
         poke.rand_sp_defense = parseInt(match.groups['sdef']);
         poke.rand_ability1 = match.groups['ability1'];

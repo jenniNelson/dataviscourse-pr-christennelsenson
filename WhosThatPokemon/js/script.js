@@ -13,7 +13,7 @@ loadData().then(poke_dict => {
     let fancydex = new FancyDex(poke_dict, card_manager);
 
 
-    let dataLoader = new DataLoader(poke_dict, card_manager);
+    let dataLoader = new DataLoader(poke_dict, card_manager, matchupview, fancydex);
 
     card_manager.update_objects();
 
@@ -247,7 +247,7 @@ class Pokemon{
         this.rand_hp = null;
         this.rand_attack = null;
         this.rand_defense = null;
-        this.rand_special = null;
+        this.rand_speed = null;
         this.rand_sp_attack = null;
         this.rand_sp_defense = null;
         this.rand_ability1 = null;
@@ -255,13 +255,53 @@ class Pokemon{
         this.rand_item = null;
         this.rand_ev_froms = null;
         this.is_randomized = false;
+
+        // TODO: currently for test purposes defaults to true.
+        this.is_stats_revealed = true;
+        this.is_encountered = true;
     }
 
-    getStat(stat, is_rando) {
-        if(!is_rando) {
+    getStat(stat) {
+        if(!this.is_randomized) {
             return this[stat]
         } else {
+            if(this.is_stats_revealed) {
+                return this["rand_" +stat]
+            }
             return 0;
+        }
+    }
+
+    getStats() {
+        if(!this.is_randomized) {
+            return [this.hp, this.attack, this.defense, this.sp_attack, this.sp_defense, this.speed]
+        } else {
+            if(this.is_stats_revealed) {
+                return [this.rand_hp, this.rand_attack, this.rand_defense, this.rand_sp_attack, this.rand_sp_defense, this.rand_speed]
+            }
+            return [0,0,0,0,0,0];
+        }
+    }
+
+    getStatTotal() {
+        if(!this.is_randomized) {
+            return this.stat_total
+        } else {
+            if(this.is_stats_revealed) {
+                return this.rand_hp + this.rand_attack + this.rand_defense + this.rand_sp_attack + this.rand_sp_defense + this.rand_speed
+            }
+            return 0
+        }
+    }
+
+    getType() {
+        if(!this.is_randomized) {
+            return [this.type1, this.type2]
+        } else {
+            if (this.is_encountered || this.is_stats_revealed) {
+                return [this.rand_type1, this.rand_type2]
+            }
+            return ["missing", ""]
         }
     }
 
