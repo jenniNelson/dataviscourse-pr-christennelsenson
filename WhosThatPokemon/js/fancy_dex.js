@@ -55,33 +55,33 @@ class FancyDex {
 
     set_pokemon_data(pokemon_dict){
         let pokemon = Object.values(pokemon_dict);
-        this.max_stat_total = d3.max(pokemon.map(p => p.stat_total));
-        this.max_hp = d3.max(pokemon.map(p=>p.hp));
-        this.max_attack = d3.max(pokemon.map(p=>p.attack));
-        this.max_defense = d3.max(pokemon.map(p=>p.defense));
-        this.max_sp_attack = d3.max(pokemon.map(p=>p.sp_attack));
-        this.max_sp_defense = d3.max(pokemon.map(p=>p.sp_defense));
-        this.max_speed = d3.max(pokemon.map(p=>p.speed));
+        this.max_stat_total = d3.max(pokemon.map(p => p.getStatTotal()));
+        this.max_hp = d3.max(pokemon.map(p=>p.getStat('hp')));
+        this.max_attack = d3.max(pokemon.map(p=>p.getStat('attack')));
+        this.max_defense = d3.max(pokemon.map(p=>p.getStat('defense')));
+        this.max_sp_attack = d3.max(pokemon.map(p=>p.getStat('sp_attack')));
+        this.max_sp_defense = d3.max(pokemon.map(p=>p.getStat('sp_defense')));
+        this.max_speed = d3.max(pokemon.map(p=>p.getStat('speed')));
 
         // This view needs slightly processed data
         this.pokemon = pokemon
             .map((p) => {
             let team = {};
             for (let i of [0, 1, 2, 3, 4, 5]) {
-                team[i] = card_manager.vs[i] === p.long_id;
+                team[i] = this.card_manager.vs[i] === p.long_id;
             }
             let newp = {
                 name : p.name,
                 long_id : p.long_id,
-                stat_total : p.stat_total,
-                hp : p.hp,
-                attack : p.attack,
-                defense : p.defense,
-                sp_attack : p.sp_attack,
-                sp_defense : p.sp_defense,
-                speed : p.speed,
-                type1 : p.type1,
-                type2 : p.type2,
+                stat_total : p.getStatTotal(),
+                hp : p.getStat('hp'),
+                attack : p.getStat('attack'),
+                defense : p.getStat('defense'),
+                sp_attack : p.getStat('sp_attack'),
+                sp_defense : p.getStat('sp_defense'),
+                speed : p.getStat('speed'),
+                type1 : p.getType()[0],
+                type2 : p.getType()[1],
                 ev_from : p.ev_from,
                 ev_to : p.ev_to,
                 is_base : p.is_base,
@@ -94,25 +94,28 @@ class FancyDex {
                 weight_kg : p.weight_kg,
                 locations : p.locations,
 
-                perc_stat_total : 100* p.stat_total / this.max_stat_total,
-                perc_hp : 100* p.hp / this.max_hp,
-                perc_attack : 100* p.attack / this.max_attack,
-                perc_defense : 100* p.defense / this.max_defense,
-                perc_sp_attack : 100* p.sp_attack / this.max_sp_attack,
-                perc_sp_defense : 100* p.sp_defense / this.max_sp_defense,
-                perc_speed : 100* p.speed / this.max_speed,
+                perc_stat_total : 100* p.getStatTotal() / this.max_stat_total,
+                perc_hp : 100* p.getStat('hp') / this.max_hp,
+                perc_attack : 100* p.getStat('attack') / this.max_attack,
+                perc_defense : 100* p.getStat('defense') / this.max_defense,
+                perc_sp_attack : 100* p.getStat('sp_attack') / this.max_sp_attack,
+                perc_sp_defense : 100* p.getStat('sp_defense') / this.max_sp_defense,
+                perc_speed : 100* p.getStat('speed') / this.max_speed,
 
-                vs : { 0: card_manager.vs[0]===p.long_id, 1: card_manager.vs[1]===p.long_id},
-                team: team
+                vs : { 0: this.card_manager.vs[0]===p.long_id, 1: this.card_manager.vs[1]===p.long_id},
+                team: team,
+
+                is_randomized: p.is_randomized
             };
             return newp;
         });
-        console.log(this.pokemon)
+        console.log(this.pokemon);
     }
 
 
-    update_post_randomize(){
-
+    update_post_randomize(pokemon_dict){
+        this.set_pokemon_data(pokemon_dict);
+        this.fancydex.setData(this.pokemon);
     }
 
 

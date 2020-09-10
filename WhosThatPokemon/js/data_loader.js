@@ -14,13 +14,13 @@ function long_id_from_id(id){
 
 class DataLoader {
 
-    constructor(poke_dict, card_manager, matchup_panel, list_panel) {
+    constructor(poke_dict, card_manager, matchup_panel, fancy_dex) {
         let that = this;
         this.uploader_button = document.getElementById("file_selector");
         this.uploader_button.addEventListener("change", ev => this.read_new_log(ev.target.files[0]));
         this.poke_dict = poke_dict;
         this.card_manager = card_manager;
-        this.list_panel = list_panel;
+        this.fancy_dex = fancy_dex;
         this.matchup_panel = matchup_panel;
 
     }
@@ -39,7 +39,7 @@ class DataLoader {
 
         //console.log(this.poke_dict);
 
-        //this.list_panel.refresh();
+
 
     }
 
@@ -125,6 +125,7 @@ class DataLoader {
             }
 
             that.matchup_panel.refresh_panes();
+            that.fancy_dex.update_post_randomize(that.poke_dict);
         };
         reader.readAsText(file);
 
