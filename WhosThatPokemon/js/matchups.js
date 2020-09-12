@@ -189,9 +189,12 @@ class Matchups{
 
     //The first of two meaty methods. Fills in a card with all information about a Pokemon.
     draw_card(id, svg_id) {
+        let that = this;
 
         let stat_labels = ["hp","atk","def","s.a.", "s.d.", "spd"];
-        d3.select(svg_id).select("g").remove();
+        d3.select(svg_id)
+            .attr("height", that.card_manager.rando_mode ? 250: 225 )
+            .select("g").remove();
         let pallet = d3.select(svg_id).append("g");
         let mon;
         if (id === "whodat"){
@@ -202,7 +205,7 @@ class Matchups{
         pallet.append("rect")
             .attr("x", 5)
             .attr("y", 5)
-            .attr("height", 220)
+            .attr("height", that.card_manager.rando_mode ? 245: 220 )
             .attr("width", 420)
             .attr("rx", 10)
             .attr("fill", this.type_colors[mon.getType()[0]][0]);
@@ -383,6 +386,64 @@ class Matchups{
                 .attr("y", 42)
                 .style("text-anchor", "middle")
                 .style("font-size", "8pt")
+        }
+
+        if(this.card_manager.rando_mode) {
+            let checkbox_group = pallet.append("g")
+                .attr("transform", "translate(105, 222)");
+
+            checkbox_group.append("circle")
+                .attr("cx", 10)
+                .attr("cy", 10)
+                .attr("r", 10)
+                .attr("stroke", this.type_colors[mon.getType()[0]][1])
+                .attr("fill", "none")
+                .on("click", () => console.log("clicked"));//this.card_manager.update_pokemon(vs_or_tb, +card_id, prev_ev));
+
+
+            checkbox_group.append("circle")
+                .attr("cx", 10)
+                .attr("cy", 10)
+                .attr("r", 7)
+                .attr("fill", (mon.is_encountered || mon.is_stats_revealed)?this.type_colors[mon.getType()[0]][1]:this.type_colors[mon.getType()[0]][0])
+                .on("click", function() {
+                    mon.is_encountered=true;
+                    console.log(mon);
+                    that.card_manager.update_pokemon(vs_or_tb, +card_id, mon.long_id);
+                });
+
+
+            checkbox_group.append("text")
+                .attr("x", 24)
+                .attr("y", 15)
+                .style("font-size", "10pt")
+                .text("Encountered");
+
+            checkbox_group.append("circle")
+                .attr("cx", 150)
+                .attr("cy", 10)
+                .attr("r", 10)
+                .attr("stroke", this.type_colors[mon.getType()[0]][1])
+                .attr("fill", "none");
+
+
+            checkbox_group.append("circle")
+                .attr("cx", 150)
+                .attr("cy", 10)
+                .attr("r", 7)
+                .attr("fill", mon.is_stats_revealed ? this.type_colors[mon.getType()[0]][1]: this.type_colors[mon.getType()[0]][0])
+                .on("click", function() {
+                    mon.is_stats_revealed = true;
+                    mon.is_encountered = true;
+                    that.card_manager.update_pokemon(vs_or_tb, +card_id, mon.long_id)
+                });
+
+
+            checkbox_group.append("text")
+                .attr("x", 164)
+                .attr("y", 15)
+                .style("font-size", "10pt")
+                .text("Caught");
         }
     }
 
@@ -1008,5 +1069,15 @@ let missingno = {
                 height_m: "?",
                 weight_kg: "?",
                 ev_from : "",
-                ev_to : []
+                ev_to : [],
+                getType() {
+                    return ["missing", ""]
+                },
+                getStats() {
+                    return [0,0,0,0,0,0]
+                },
+                getStatTotal() {
+                    return 0;
+                }
+
 };
