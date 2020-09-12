@@ -257,8 +257,8 @@ class Pokemon{
         this.is_randomized = false;
 
         // TODO: currently for test purposes defaults to true.
-        this.is_stats_revealed = true;
-        this.is_encountered = true;
+        this.is_stats_revealed = false;
+        this.is_encountered = false;
     }
 
     getStat(stat) {
