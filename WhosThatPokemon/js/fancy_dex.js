@@ -47,14 +47,19 @@ class FancyDex {
         this.card_manager.add_callback(update_selected);
         // this.pokemon = pokemon;
 
-        this.set_pokemon_data(pokemon);
+        this.rando_mode = false;
+        this.pokemon_dict = pokemon;
+        this.set_pokemon_data();
 
 
         this.initialize_table();
     }
 
-    set_pokemon_data(pokemon_dict){
-        let pokemon = Object.values(pokemon_dict);
+    set_pokemon_data(){
+        let pokemon = Object.values(this.pokemon_dict);
+        // if(this.rando_mode){
+        //     pokemon = pokemon.filter(p => p.is_randomized);
+        // }
         this.max_stat_total = d3.max(pokemon.map(p => p.getStatTotal()));
         this.max_hp = d3.max(pokemon.map(p=>p.getStat('hp')));
         this.max_attack = d3.max(pokemon.map(p=>p.getStat('attack')));
@@ -65,59 +70,97 @@ class FancyDex {
 
         // This view needs slightly processed data
         this.pokemon = pokemon
-            .map((p) => {
-            let team = {};
-            for (let i of [0, 1, 2, 3, 4, 5]) {
-                team[i] = this.card_manager.vs[i] === p.long_id;
-            }
-            let newp = {
-                name : p.name,
-                long_id : p.long_id,
-                stat_total : p.getStatTotal(),
-                hp : p.getStat('hp'),
-                attack : p.getStat('attack'),
-                defense : p.getStat('defense'),
-                sp_attack : p.getStat('sp_attack'),
-                sp_defense : p.getStat('sp_defense'),
-                speed : p.getStat('speed'),
-                type1 : p.getType()[0],
-                type2 : p.getType()[1],
-                ev_from : p.ev_from,
-                ev_to : p.ev_to,
-                is_base : p.is_base,
-                is_full_ev : p.is_full_ev,
-                evo_family : p.evo_family,
-                capture_rate : p.capture_rate,
-                gen_introduced : p.gen_introduced,
-                is_legendary : p.is_legendary,
-                height_m : p.height_m,
-                weight_kg : p.weight_kg,
-                locations : p.locations,
-
-                perc_stat_total : 100* p.getStatTotal() / this.max_stat_total,
-                perc_hp : 100* p.getStat('hp') / this.max_hp,
-                perc_attack : 100* p.getStat('attack') / this.max_attack,
-                perc_defense : 100* p.getStat('defense') / this.max_defense,
-                perc_sp_attack : 100* p.getStat('sp_attack') / this.max_sp_attack,
-                perc_sp_defense : 100* p.getStat('sp_defense') / this.max_sp_defense,
-                perc_speed : 100* p.getStat('speed') / this.max_speed,
-
-                vs : { 0: this.card_manager.vs[0]===p.long_id, 1: this.card_manager.vs[1]===p.long_id},
-                team: team,
-
-                is_randomized: p.is_randomized
-            };
-            return newp;
-        });
+            .map(p => this.pokemon_to_fancydex_mon(p, this));
         console.log(this.pokemon);
     }
 
+    pokemon_to_fancydex_mon(p, that) {
+        let team = {};
+        for (let i of [0, 1, 2, 3, 4, 5]) {
+            team[i] = that.card_manager.vs[i] === p.long_id;
+        }
+        let newp = {
+            name : p.name,
+            long_id : p.long_id,
+            stat_total : p.getStatTotal(),
+            hp : p.getStat('hp'),
+            attack : p.getStat('attack'),
+            defense : p.getStat('defense'),
+            sp_attack : p.getStat('sp_attack'),
+            sp_defense : p.getStat('sp_defense'),
+            speed : p.getStat('speed'),
+            type1 : p.is_encountered ? p.getType()[0] : "",
+            type2 : p.is_encountered ? p.getType()[1] : "",
+            ev_from : p.ev_from,
+            ev_to : p.ev_to,
+            is_base : p.is_base,
+            is_full_ev : p.is_full_ev,
+            evo_family : p.evo_family,
+            capture_rate : p.capture_rate,
+            gen_introduced : p.gen_introduced,
+            is_legendary : p.is_legendary,
+            height_m : p.height_m,
+            weight_kg : p.weight_kg,
+            locations : p.locations,
 
-    update_post_randomize(pokemon_dict){
-        this.set_pokemon_data(pokemon_dict);
-        this.fancydex.setData(this.pokemon);
+            perc_stat_total : 100* p.getStatTotal() / this.max_stat_total,
+            perc_hp : 100* p.getStat('hp') / this.max_hp,
+            perc_attack : 100* p.getStat('attack') / this.max_attack,
+            perc_defense : 100* p.getStat('defense') / this.max_defense,
+            perc_sp_attack : 100* p.getStat('sp_attack') / this.max_sp_attack,
+            perc_sp_defense : 100* p.getStat('sp_defense') / this.max_sp_defense,
+            perc_speed : 100* p.getStat('speed') / this.max_speed,
+
+            vs : { 0: this.card_manager.vs[0]===p.long_id, 1: this.card_manager.vs[1]===p.long_id},
+            team: team,
+
+            is_randomized: p.is_randomized,
+            is_encountered : p.is_encountered,
+            is_stats_revealed : p.is_stats_revealed
+        };
+        return newp;
+
     }
 
+    update_post_randomize(){
+        this.rando_mode = true;
+        this.set_pokemon_data();
+        this.fancydex.setData(this.pokemon);
+        // Filter out the nonrandomized pokemon
+    }
+
+    update_single_pokemon(long_id){
+        let mon = this.pokemon_dict[long_id];
+        this.fancydex.updateData([this.pokemon_to_fancydex_mon(mon, this)]);
+    }
+
+    encounter_pokemon(long_id){
+        let mon = this.pokemon_dict[long_id];
+        if (mon.is_randomized){
+            // this.fancydex.updateData([{
+            //     id: mon.long_id,
+            //     stat_total : p.getStatTotal(),
+            //     hp : p.getStat('hp'),
+            //     attack : p.getStat('attack'),
+            //     defense : p.getStat('defense'),
+            //     sp_attack : p.getStat('sp_attack'),
+            //     sp_defense : p.getStat('sp_defense'),
+            //     speed : p.getStat('speed'),
+            //     type1 : p.getType()[0],
+            //     type2 : p.getType()[1],
+            // }]);
+            this.fancydex.updateData([this.pokemon_to_fancydex_mon(mon, this)])
+        }
+    }
+    unencounter_pokemon(long_id){
+
+    }
+    capture_pokemon(long_id){
+
+    }
+    uncapture_pokemon(long_id){
+
+    }
 
     initialize_table(){
         let that = this;
