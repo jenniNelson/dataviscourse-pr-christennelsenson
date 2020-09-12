@@ -45,6 +45,7 @@ class FancyDex {
 
         this.card_manager = card_manager;
         this.card_manager.add_callback(update_selected);
+        this.card_manager.add_callback((cat,which_card,to_who) => this.update_single_pokemon(to_who));
         // this.pokemon = pokemon;
 
         this.rando_mode = false;
@@ -131,7 +132,9 @@ class FancyDex {
 
     update_single_pokemon(long_id){
         let mon = this.pokemon_dict[long_id];
-        this.fancydex.updateData([this.pokemon_to_fancydex_mon(mon, this)]);
+        if(mon){
+            this.fancydex.updateData([this.pokemon_to_fancydex_mon(mon, this)]);
+        }
     }
 
     encounter_pokemon(long_id){
