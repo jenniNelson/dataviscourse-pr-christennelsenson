@@ -55,9 +55,30 @@
             (u0899251@utah.edu & u1060401@utah.edu)
         </h4>
     </li>
+    <li style="vertical-align: middle;">
+        <table>
+            <tr>
+                <td>
+                    <input type="file" id="file_selector" title="Click here to upload a rando log or saved pokedex"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="button" id="prev_file_selector" value="hello" title="Save Dex" onclick="document.getElementById('prev_file_selector_worker').click();"/>
+                    <input type="file" id="prev_file_selector_worker"  style="display:none" onclick="console.log('Ya got me1')"/>
+                </td>
+
+            </tr>
+            <tr>
+                <td>
+                    <input type="button" id="file_saver" value="world" title="Save Dex" onclick="document.getElementById('file_saver_worker').click();"/>
+                    <input type="file" id="file_saver_worker"  style="display:none" onclick="console.log('Ya got me2')"/>
+                </td>
+            </tr>
+        </table>
+    </li>
     <li>
-        <p>(Optional) upload rando log here</p>
-        <input type="file" id="file_selector" title="Click here to upload a rando log or saved pokedex">
+        <input type="button" value="Spoil Me" style="height: 40px;"/>
     </li>
 </ul>
 
