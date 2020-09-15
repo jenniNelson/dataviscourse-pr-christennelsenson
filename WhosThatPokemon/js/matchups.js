@@ -407,7 +407,12 @@ class Matchups{
                 .attr("r", 7)
                 .attr("fill", (mon.is_encountered || mon.is_stats_revealed)?this.type_colors[mon.getType()[0]][1]:this.type_colors[mon.getType()[0]][0])
                 .on("click", function() {
-                    mon.is_encountered=true;
+                    if(mon.is_stats_revealed){
+                        mon.is_stats_revealed = false;
+                        mon.is_encountered = false;
+                    } else{
+                        mon.is_encountered = !mon.is_encountered;
+                    }
                     console.log(mon);
                     that.card_manager.update_pokemon(vs_or_tb, +card_id, mon.long_id);
                 });
@@ -433,8 +438,12 @@ class Matchups{
                 .attr("r", 7)
                 .attr("fill", mon.is_stats_revealed ? this.type_colors[mon.getType()[0]][1]: this.type_colors[mon.getType()[0]][0])
                 .on("click", function() {
-                    mon.is_stats_revealed = true;
-                    mon.is_encountered = true;
+                    if (mon.is_stats_revealed){
+                        mon.is_stats_revealed = false;
+                    }else {
+                        mon.is_stats_revealed = true;
+                        mon.is_encountered = true;
+                    }
                     that.card_manager.update_pokemon(vs_or_tb, +card_id, mon.long_id)
                 });
 
@@ -900,6 +909,10 @@ function team_can_cover(mons, type) {
 
 //Determines if an individual pokemon is weak to a particular type
 function is_weak_to(mon, type) {
+    // Assuming that if we don't know the type, there's no type weakness
+    if( mon.getType()[0] === '' || mon.getType()[0] === 'missing'){
+        return false;
+    }
     let idx1 = types_to_idx[mon.getType()[0]];
     let atkidx = types_to_idx[type];
     if(mon.getType()[1] !== '' && mon.getType()[1] !== mon.getType()[0]) {
@@ -912,6 +925,10 @@ function is_weak_to(mon, type) {
 
 //Determines if an individual pokemon is strong against a particular type
 function can_cover(mon, type) {
+    // Assuming that if we don't know the type, there's no type strength
+    if( mon.getType()[0] === '' || mon.getType()[0] === 'missing'){
+        return false;
+    }
     let idx1 = types_to_idx[mon.getType()[0]];
     let defidx = types_to_idx[type];
     if(mon.getType()[1] !== '' && mon.getType()[1] !== mon.getType()[0]) {
@@ -959,6 +976,12 @@ function stat(base, level=50) {
 
 //Returns the multiplier an attack would have given the two pokemon's types
 function type_modifier(attacker, defender) {
+    // Assuming that if we don't know the type of one/both, it's an even fight
+    if(attacker.getType()[0] === '' || attacker.getType()[0] === 'missing'
+        || defender.getType()[0] === '' || defender.getType()[0] === 'missing'){
+        return 1;
+    }
+
     let atk_1 = types_to_idx[attacker.getType()[0]];
     let def_1 = types_to_idx[defender.getType()[0]];
 
