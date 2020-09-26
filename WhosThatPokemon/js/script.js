@@ -203,6 +203,9 @@ class CardManager{
 /** The data structure to hold all info about a particular pokemon **/
 class Pokemon{
     constructor(csv_result) {
+        if (csv_result===undefined){
+            return;
+        }
         this.name = csv_result.name;
         this.long_id = csv_result.long_id;
 

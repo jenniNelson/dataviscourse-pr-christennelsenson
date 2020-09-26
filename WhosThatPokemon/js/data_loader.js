@@ -15,13 +15,82 @@ function long_id_from_id(id){
 class DataLoader {
 
     constructor(poke_dict, card_manager, matchup_panel, fancy_dex) {
-        let that = this;
-        this.uploader_button = document.getElementById("file_selector");
-        this.uploader_button.addEventListener("change", ev => this.read_new_log(ev.target.files[0]));
+        this.log_uploader_button = document.getElementById("rando_log_selector_worker");
+        this.log_uploader_button.addEventListener("change", ev => this.read_new_log(ev.target.files[0]));
+        this.log_uploader_button = document.getElementById("saved_state_selector_worker");
+        this.log_uploader_button.addEventListener("change", ev => this.read_saved_state(ev.target.files[0]));
+        this.save_button = document.getElementById("file_saver");
+        this.save_button.addEventListener("click", ev => this.get_saved_state());
         this.poke_dict = poke_dict;
         this.card_manager = card_manager;
         this.fancy_dex = fancy_dex;
         this.matchup_panel = matchup_panel;
+
+    }
+
+    read_saved_state(file){
+        let that = this;
+        var reader = new FileReader();
+        reader.onload = function(event) {
+            let saved_state = JSON.parse(event.target.result);
+
+            if(saved_state["pokemon"] == null || saved_state["team"] == null || saved_state["vs"] == null || saved_state["rando_mode"] == null){
+                console.log("ERROR: Uploaded file could not be parsed as a saved state");
+                return;
+            }
+
+            let parsed_poke_dict = {};
+            for( let long_id in saved_state.pokemon){
+                parsed_poke_dict[long_id] = ( Object.assign(new Pokemon, saved_state.pokemon[long_id]))
+            }
+            console.log(parsed_poke_dict);
+
+            // Set all the data values
+            that.card_manager.vs = saved_state.vs;
+            that.card_manager.team = saved_state.team;
+            that.card_manager.rando_mode = saved_state.rando_mode;
+            that.matchup_panel.poke_dict = parsed_poke_dict;
+            that.fancy_dex.pokemon_dict = parsed_poke_dict;
+
+            // Refresh
+            that.matchup_panel.refresh_panes();
+            that.fancy_dex.update_post_randomize();
+
+
+        };
+
+
+        reader.readAsText(file);
+
+    }
+
+    download(filename, text) {
+        let element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
+    }
+
+    get_saved_state(){
+
+
+        let save_obj = {
+            pokemon: this.poke_dict,
+            team: this.card_manager.team,
+            vs: this.card_manager.vs,
+            rando_mode: this.card_manager.rando_mode
+        };
+
+
+        let filename = "pokemern.pok";
+        console.log(JSON.stringify(save_obj));
+        this.download(filename, JSON.stringify(save_obj));
 
     }
 
@@ -125,7 +194,7 @@ class DataLoader {
             }
 
             that.matchup_panel.refresh_panes();
-            that.fancy_dex.update_post_randomize(that.poke_dict);
+            that.fancy_dex.update_post_randomize();
         };
         reader.readAsText(file);
 

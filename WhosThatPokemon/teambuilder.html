@@ -60,20 +60,19 @@
         <table>
             <tr>
                 <td>
-                    <input type="file" id="file_selector" title="Click here to upload a rando log or saved pokedex"/>
+                    <input type="button" id="rando_log_selector" value="Upload Rando Log" title="Click here to upload a rando log" onclick="document.getElementById('rando_log_selector_worker').click();"/>
+                    <input type="file" id="rando_log_selector_worker" style="display:none"/>
                 </td>
             </tr>
             <tr>
                 <td>
-                    <input type="button" id="prev_file_selector" value="hello" title="Save Dex" onclick="document.getElementById('prev_file_selector_worker').click();"/>
-                    <input type="file" id="prev_file_selector_worker"  style="display:none" onclick="console.log('Ya got me1')"/>
+                    <input type="button" id="saved_state_selector" value="Upload Saved State" title="Save Dex" onclick="document.getElementById('saved_state_selector_worker').click();"/>
+                    <input type="file" id="saved_state_selector_worker"  style="display:none"/>
                 </td>
-
             </tr>
             <tr>
                 <td>
-                    <input type="button" id="file_saver" value="world" title="Save Dex" onclick="document.getElementById('file_saver_worker').click();"/>
-                    <input type="file" id="file_saver_worker"  style="display:none" onclick="console.log('Ya got me2')"/>
+                    <input type="button" id="file_saver" value="Save Data" title="Save Dex"/>
                 </td>
             </tr>
         </table>
