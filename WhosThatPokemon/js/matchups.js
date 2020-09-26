@@ -70,6 +70,7 @@ class Matchups{
 
         this.hp_bar_scale = d3.scaleLinear().domain([0,1]).range([0,300]);
 
+        this.individual_view = new IndividualView(this.card_manager, this.poke_dict, "006");
         //initialize components of each view.
         this.initialize_tabs();
         this.fill_dropdowns();
@@ -79,7 +80,7 @@ class Matchups{
 
     initialize_tabs() {
         let that = this;
-        d3.selectAll("#view_switcher .tablinks").data(["vs", "team"])
+        d3.selectAll("#view_switcher .tablinks").data(["vs", "team", "iv"])
             .on("click", d=>that.switch_tabs(d));
         d3.select("#team_builder_button")
             .classed("active", true);
@@ -112,6 +113,14 @@ class Matchups{
                 .classed("hidden", false);
             this.current_view = "team"
         }
+        else if (name === "iv" && this.current_view !== "iv") {
+            d3.select("#individual_view_button")
+                .classed("active", true);
+            d3.select("#individual_view_pane")
+                .classed("hidden", false);
+            this.current_view = "iv";
+        }
+
     }
 
     //Fill every dropdown menu in both vs and team views
@@ -157,6 +166,7 @@ class Matchups{
                 .attr("width", 430)
                 .attr("height", 225)
         }
+
     }
 
     //initialize both cards in vs, and all 6 cards in team builder
