@@ -58,6 +58,8 @@ class CardManager{
             queue: [0,1,2,3,4,5]
         };
 
+        this.iv = '006';
+
         this.callbacks = [];
 
         this.rando_mode = false;
@@ -217,6 +219,9 @@ class Pokemon{
         this.sp_defense = +csv_result.sp_defense;
         this.speed = +csv_result.speed;
 
+        this.ability1 = ''; //TODO: We don't actually have vanilla abilities easily yet
+        this.ability2 = '';
+
         this.type1 = csv_result.type1; //strings
         this.type2 = csv_result.type2;
 
@@ -256,12 +261,15 @@ class Pokemon{
         this.rand_ability1 = null;
         this.rand_ability2 = null;
         this.rand_item = null;
-        this.rand_ev_froms = null;
+        this.rand_ev_froms = [];
+        this.rand_ev_to = [];
         this.is_randomized = false;
 
         // TODO: currently for test purposes defaults to true.
         this.is_stats_revealed = false;
         this.is_encountered = false;
+        this.revealed_ev_from_idxs = [];
+        this.revealed_ev_to_idxs = [];
     }
 
     getStat(stat) {
@@ -305,6 +313,41 @@ class Pokemon{
                 return [this.rand_type1, this.rand_type2]
             }
             return ["missing", ""]
+        }
+    }
+
+    getAbilities() {
+        if(!this.is_randomized) {
+            return [this.ability1, this.ability2]
+        } else {
+            if (this.is_stats_revealed) {
+                return [this.rand_ability1, this.rand_ability2]
+            }
+            return ["???", ""]
+        }
+    }
+
+    getEvosTo() {
+        if(!this.is_randomized) {
+            return this.ev_to
+        } else {
+            return this.rand_ev_to
+        }
+    }
+
+    getEvosFrom() {
+        if(!this.is_randomized) {
+            return this.ev_from
+        } else {
+            return this.rand_ev_froms
+        }
+    }
+
+    getRevealedEvosFrom() {
+        if(!this.is_randomized) {
+            return this.ev_from
+        } else {
+            return this.revealed_ev_from_idxs.map( i => this.rand_ev_froms[i])//this.rand_ev_froms
         }
     }
 

@@ -167,6 +167,17 @@ class Matchups{
                 .attr("height", 225)
         }
 
+        d3.select("#iv_dd").selectAll("option").data(this.mons).join("option")
+            .property("selected", d=>d.long_id === this.card_manager.iv)
+            .attr("value", d=>d.long_id)
+            .text(d => (d.long_id === "whodat")?"(No Selection)":(d.name + " (#" + d.long_id + ")"));
+
+        //Add dropdown to iv;
+        $("#iv_dd").select2().on("select2:select", function(evt) {
+                let mon = d3.select(evt.params.data.element).datum();
+                that.card_manager.iv = mon.long_id;
+                that.individual_view.update(mon.long_id)
+        });
     }
 
     //initialize both cards in vs, and all 6 cards in team builder
@@ -187,14 +198,25 @@ class Matchups{
     }
 
     //Part of the method passed into our callback manager.
+    //TODO: Update to include individual view
     update_card(cat, pos, mon_id) {
-        let dd_id = ((cat==="vs")?"#vs_dd_":"#tb_dd_") + pos;
-        let svg_id = ((cat==="vs")?"#vs_svg_":"#tb_svg_") + pos;
+        if( cat === "vs" || cat === "team") {
+            let dd_id = ((cat==="vs")?"#vs_dd_":"#tb_dd_") + pos;
+            let svg_id = ((cat==="vs")?"#vs_svg_":"#tb_svg_") + pos;
 
-        console.log(svg_id);
+            console.log(svg_id);
 
-        $(dd_id).val(mon_id).trigger("change");
-        this.draw_card(mon_id, svg_id);
+            $(dd_id).val(mon_id).trigger("change");
+            this.draw_card(mon_id, svg_id);
+        } else if(cat === "iv") {
+            // let dd_id = "iv_dd";
+            // let svg_id = "iv_svg";
+            //
+            // console.log(svg_id);
+            // $(dd_id).val(mon_id).trigger("change");
+            // this.individual_view.update(mon_id);
+        }
+
     }
 
     //The first of two meaty methods. Fills in a card with all information about a Pokemon.
@@ -370,7 +392,7 @@ class Matchups{
                 .attr("y", 0);
 
             let groups = next_group.selectAll("g").data(next_evs).join("g")
-                .attr("transform", (d,i) => "translate(" +( -20 + i*-45 )+ ", 10)")
+                .attr("transform", (d,i) => "translate(" +( -20 + i*-45 )+ ", 10)");
 
             groups.append("circle")
                 .attr("cx", 20)
@@ -482,14 +504,17 @@ class Matchups{
         this.draw_vs_summary();
 
         this.draw_team_summary();
+        this.individual_view.update(this.individual_view.current_mon)
     }
 
     //Part of the method passed into our callback manager.
     update_summary(category) {
         if (category === "vs") {
             this.draw_vs_summary();
-        } else {
+        } else if (category === "tb") {
             this.draw_team_summary();
+        } else if (category === "iv") {
+            // this.individual_view.update(this.individual_view.current_mon)
         }
 
     }
@@ -868,6 +893,7 @@ class Matchups{
 
         this.update_summary("vs");
         this.update_summary("team");
+        this.individual_view.update(this.individual_view.current_mon)
         //TODO update third tab
     }
 }
@@ -1111,6 +1137,9 @@ let missingno = {
                 },
                 getStatTotal() {
                     return 0;
+                },
+                getAbilities() {
+                    return ["???",""];
                 }
 
 };
