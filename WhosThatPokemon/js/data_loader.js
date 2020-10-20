@@ -67,7 +67,8 @@ class DataLoader {
 
             let parsed_poke_dict = {};
             for( let long_id in saved_state.pokemon){
-                parsed_poke_dict[long_id] = ( Object.assign(new Pokemon, saved_state.pokemon[long_id]))
+                parsed_poke_dict[long_id] = ( Object.assign(new Pokemon, saved_state.pokemon[long_id]));
+
             }
             console.log(parsed_poke_dict);
 
@@ -78,6 +79,8 @@ class DataLoader {
             that.matchup_panel.poke_dict = parsed_poke_dict;
             that.matchup_panel.individual_view.current_mon = saved_state.individual_view;
             that.fancy_dex.pokemon_dict = parsed_poke_dict;
+            that.poke_dict = parsed_poke_dict;
+
 
             // Refresh
             that.matchup_panel.refresh_panes();
