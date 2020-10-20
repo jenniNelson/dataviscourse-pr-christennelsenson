@@ -351,6 +351,20 @@ class Pokemon{
         }
     }
 
+    reveal_evolutions() {
+        for(let i = 0; i < this.rand_ev_to.length; i++) {
+            this.revealed_ev_to_idxs.push(i);
+        }
+        for(let i = 0; i < this.rand_ev_froms.length; i++) {
+            this.revealed_ev_from_idxs.push(i);
+        }
+    }
+
+    hide_evolutions() {
+        this.revealed_ev_to_idxs = [];
+        this.revealed_ev_from_idxs = [];
+    }
+
 }
 
 function string_to_list(str) {

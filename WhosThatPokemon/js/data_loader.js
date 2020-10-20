@@ -37,6 +37,7 @@ class DataLoader {
             for(let mon_id in this.poke_dict){
                 this.poke_dict[mon_id].is_encountered = true;
                 this.poke_dict[mon_id].is_stats_revealed = true;
+                this.poke_dict[mon_id].reveal_evolutions();
             }
             this.spoil_me_button.value = "Un-Spoil Me";
             this.spoil_toggle = !this.spoil_toggle;
@@ -45,6 +46,7 @@ class DataLoader {
             for(let mon_id in this.poke_dict){
                 this.poke_dict[mon_id].is_encountered = false;
                 this.poke_dict[mon_id].is_stats_revealed = false;
+                this.poke_dict[mon_id].hide_evolutions();
             }
             this.spoil_me_button.value = "Spoil Me";
             this.spoil_toggle = !this.spoil_toggle;
