@@ -21,6 +21,7 @@ class DataLoader {
         this.save_uploader_button.addEventListener("change", ev => this.read_saved_state(ev.target.files[0]));
         this.save_button = document.getElementById("file_saver");
         this.save_button.addEventListener("click", ev => this.get_saved_state());
+        this.spoil_toggle = true;
         this.spoil_me_button = document.getElementById("spoil_me");
         this.spoil_me_button.addEventListener("click", ev => this.spoil_me());
         this.poke_dict = poke_dict;
@@ -31,13 +32,26 @@ class DataLoader {
     }
 
     spoil_me(){
-        for(let mon_id in this.poke_dict){
-            this.poke_dict[mon_id].is_encountered = true;
-            this.poke_dict[mon_id].is_stats_revealed = true;
-        }
+        if (this.spoil_toggle){
 
+            for(let mon_id in this.poke_dict){
+                this.poke_dict[mon_id].is_encountered = true;
+                this.poke_dict[mon_id].is_stats_revealed = true;
+            }
+            this.spoil_me_button.value = "Un-Spoil Me";
+            this.spoil_toggle = !this.spoil_toggle;
+
+        } else {
+            for(let mon_id in this.poke_dict){
+                this.poke_dict[mon_id].is_encountered = false;
+                this.poke_dict[mon_id].is_stats_revealed = false;
+            }
+            this.spoil_me_button.value = "Spoil Me";
+            this.spoil_toggle = !this.spoil_toggle;
+        }
         this.matchup_panel.refresh_panes();
         this.fancy_dex.update_post_randomize();
+
     }
 
     read_saved_state(file){
@@ -46,7 +60,7 @@ class DataLoader {
         reader.onload = function(event) {
             let saved_state = JSON.parse(event.target.result);
 
-            if(saved_state["pokemon"] == null || saved_state["team"] == null || saved_state["vs"] == null || saved_state["rando_mode"] == null){
+            if(saved_state["pokemon"] == null || saved_state["team"] == null || saved_state["vs"] == null || saved_state["rando_mode"] == null || saved_state["individual_view"] == null){
                 console.log("ERROR: Uploaded file could not be parsed as a saved state");
                 return;
             }
@@ -62,6 +76,7 @@ class DataLoader {
             that.card_manager.team = saved_state.team;
             that.card_manager.rando_mode = saved_state.rando_mode;
             that.matchup_panel.poke_dict = parsed_poke_dict;
+            that.matchup_panel.individual_view.current_mon = saved_state.individual_view;
             that.fancy_dex.pokemon_dict = parsed_poke_dict;
 
             // Refresh
@@ -97,6 +112,7 @@ class DataLoader {
             pokemon: this.poke_dict,
             team: this.card_manager.team,
             vs: this.card_manager.vs,
+            individual_view: this.matchup_panel.individual_view.current_mon,
             rando_mode: this.card_manager.rando_mode
         };
 
