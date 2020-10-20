@@ -17,8 +17,8 @@ class DataLoader {
     constructor(poke_dict, card_manager, matchup_panel, fancy_dex) {
         this.log_uploader_button = document.getElementById("rando_log_selector_worker");
         this.log_uploader_button.addEventListener("change", ev => this.read_new_log(ev.target.files[0]));
-        this.log_uploader_button = document.getElementById("saved_state_selector_worker");
-        this.log_uploader_button.addEventListener("change", ev => this.read_saved_state(ev.target.files[0]));
+        this.save_uploader_button = document.getElementById("saved_state_selector_worker");
+        this.save_uploader_button.addEventListener("change", ev => this.read_saved_state(ev.target.files[0]));
         this.save_button = document.getElementById("file_saver");
         this.save_button.addEventListener("click", ev => this.get_saved_state());
         this.spoil_me_button = document.getElementById("spoil_me");
@@ -31,7 +31,13 @@ class DataLoader {
     }
 
     spoil_me(){
-        // TODO
+        for(let mon_id in this.poke_dict){
+            this.poke_dict[mon_id].is_encountered = true;
+            this.poke_dict[mon_id].is_stats_revealed = true;
+        }
+
+        this.matchup_panel.refresh_panes();
+        this.fancy_dex.update_post_randomize();
     }
 
     read_saved_state(file){
@@ -61,6 +67,7 @@ class DataLoader {
             // Refresh
             that.matchup_panel.refresh_panes();
             that.fancy_dex.update_post_randomize();
+            that.spoil_me_button.style.display = "";
 
 
         };
@@ -111,6 +118,8 @@ class DataLoader {
         this.poke_dict["002"].attack = 200;
 
         this.parse_log(file);
+
+        this.spoil_me_button.style.display = "";
 
         //console.log(this.poke_dict);
 
