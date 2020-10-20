@@ -76,8 +76,11 @@ class IndividualView {
     }
 
     follow_evolution_from(idx) {
-
-        let dest_mon = this.mons[this.current_mon.getRevealedEvosFrom()[idx]];
+        let dest_id=this.mons[this.current_mon].getRevealedEvosFrom()[idx];
+        console.log(idx)
+        console.log(this.mons[this.current_mon].getRevealedEvosFrom());
+        console.log(dest_id);
+        let dest_mon = this.mons[this.mons[this.current_mon].getRevealedEvosFrom()[idx]];
 
         this.update(dest_mon.long_id)
     }
@@ -272,6 +275,24 @@ class IndividualView {
 
         let ev_from_group = main_group.append("g")
             .attr("transform", "translate(500, 100)");
+        ev_from_group.selectAll("circle").data(mon.getRevealedEvosFrom())
+            .join("circle")
+            .attr("cx", cradius)
+            .attr("cy", (d,i) => cradius + i*c_v_offset )
+            .attr("r", cradius)
+            .attr("fill", this.type_colors[mon.getType()[0]][1]);
+
+        ev_from_group.selectAll("image").data(mon.getRevealedEvosFrom())
+            .join("image")
+            .attr("href", d => "data/pokemon_data/sprites/" + d + ".png")
+            .attr("x", 0)
+            .attr("y", (d,i) => i*c_v_offset)
+            .attr("width", 2*cradius)
+            .attr("height", 2*cradius)
+            .each( function(d,i){
+                d3.select(this)
+                    .on("click", () => that.follow_evolution_from(i))
+            });
 
         let rev_buttons_group = main_group.append("g")
             .attr("transform", "translate(400, 400)");

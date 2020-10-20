@@ -345,7 +345,7 @@ class Pokemon{
 
     getRevealedEvosFrom() {
         if(!this.is_randomized) {
-            return this.ev_from
+            return this.ev_from?[this.ev_from]:[]
         } else {
             return this.revealed_ev_from_idxs.map( i => this.rand_ev_froms[i])//this.rand_ev_froms
         }
