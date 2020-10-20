@@ -894,7 +894,6 @@ class Matchups{
         this.update_summary("vs");
         this.update_summary("team");
         this.individual_view.update(this.individual_view.current_mon)
-        //TODO update third tab
     }
 }
 
