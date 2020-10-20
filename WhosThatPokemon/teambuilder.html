@@ -23,6 +23,7 @@
     <script src="js/maps.js"></script>
     <script src="js/matchups.js"></script>
     <script src="js/data_loader.js"></script>
+    <script src="js/individual_view.js"></script>
     <script src="js/script.js"></script>
 </head>
 <body>
@@ -76,7 +77,7 @@
             </tr>
         </table>
     </li>
-    <li>
+    <li style="display: none;">
         <input type="button" id="spoil_me" value="Spoil Me" style="height: 40px;"/>
     </li>
 </ul>
@@ -102,6 +103,7 @@
                     <div class="tab" id="view_switcher">
                         <button class="tablinks" id="vs_button">Vs View</button>
                         <button class="tablinks" id="team_builder_button">Team Builder</button>
+                        <button class="tablinks" id="individual_view_button">Individual View</button>
                     </div>
 
                     <table id="vs_table" align="center" class="lef_table hidden">
@@ -172,6 +174,11 @@
                     <div style="width: 100%" id="matchup_summary" class="lef_table hidden">
                     </div>
                     <div style="width: 100%" id="team_summary" class="lef_table ">
+                    </div>
+                    <div style="width: 100%" id="individual_view_pane" class="lef_table hidden">
+                        <div style="width: 90%; margin-left: 5%; margin-right: 5%">
+                                    <select  style="width: 100%" class="js-example-basic-single poke_selector" id="iv_dd"></select>
+                        </div>
                     </div>
 
                 </div>
