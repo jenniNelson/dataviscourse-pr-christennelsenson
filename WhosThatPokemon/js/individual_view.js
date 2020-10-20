@@ -50,6 +50,7 @@ class IndividualView {
     }
 
     update(mon_id) {
+        console.log("Hello! " + mon_id);
         this.current_mon = mon_id;
         $("#iv_dd").val(mon_id).trigger("change");
         this.drawPanel();
