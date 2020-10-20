@@ -78,6 +78,7 @@ class DataLoader {
             that.card_manager.vs = saved_state.vs;
             that.card_manager.team = saved_state.team;
             that.card_manager.rando_mode = saved_state.rando_mode;
+            that.matchup_panel.individual_view.mons = parsed_poke_dict;
             that.matchup_panel.poke_dict = parsed_poke_dict;
             that.matchup_panel.individual_view.current_mon = saved_state.individual_view;
             that.fancy_dex.pokemon_dict = parsed_poke_dict;
