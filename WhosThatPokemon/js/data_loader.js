@@ -21,11 +21,17 @@ class DataLoader {
         this.log_uploader_button.addEventListener("change", ev => this.read_saved_state(ev.target.files[0]));
         this.save_button = document.getElementById("file_saver");
         this.save_button.addEventListener("click", ev => this.get_saved_state());
+        this.spoil_me_button = document.getElementById("spoil_me");
+        this.spoil_me_button.addEventListener("click", ev => this.spoil_me());
         this.poke_dict = poke_dict;
         this.card_manager = card_manager;
         this.fancy_dex = fancy_dex;
         this.matchup_panel = matchup_panel;
 
+    }
+
+    spoil_me(){
+        // TODO
     }
 
     read_saved_state(file){
