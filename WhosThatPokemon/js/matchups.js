@@ -209,12 +209,12 @@ class Matchups{
             $(dd_id).val(mon_id).trigger("change");
             this.draw_card(mon_id, svg_id);
         } else if(cat === "iv") {
-            // let dd_id = "iv_dd";
-            // let svg_id = "iv_svg";
-            //
-            // console.log(svg_id);
-            // $(dd_id).val(mon_id).trigger("change");
-            // this.individual_view.update(mon_id);
+            let dd_id = "iv_dd";
+            let svg_id = "iv_svg";
+
+            console.log(svg_id);
+            $(dd_id).val(mon_id).trigger("change");
+            this.individual_view.update(mon_id);
         }
 
     }

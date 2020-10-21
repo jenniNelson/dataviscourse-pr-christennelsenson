@@ -137,34 +137,6 @@ class FancyDex {
         }
     }
 
-    encounter_pokemon(long_id){
-        let mon = this.pokemon_dict[long_id];
-        if (mon.is_randomized){
-            // this.fancydex.updateData([{
-            //     id: mon.long_id,
-            //     stat_total : p.getStatTotal(),
-            //     hp : p.getStat('hp'),
-            //     attack : p.getStat('attack'),
-            //     defense : p.getStat('defense'),
-            //     sp_attack : p.getStat('sp_attack'),
-            //     sp_defense : p.getStat('sp_defense'),
-            //     speed : p.getStat('speed'),
-            //     type1 : p.getType()[0],
-            //     type2 : p.getType()[1],
-            // }]);
-            this.fancydex.updateData([this.pokemon_to_fancydex_mon(mon, this)])
-        }
-    }
-    unencounter_pokemon(long_id){
-
-    }
-    capture_pokemon(long_id){
-
-    }
-    uncapture_pokemon(long_id){
-
-    }
-
     initialize_table(){
         let that = this;
 
@@ -176,7 +148,7 @@ class FancyDex {
                 return "";
             }
             return "<img width='50' src='data/pokemon_data/typelabels/" + cell.getValue() + ".gif'>";
-        }
+        };
 
         /** Two checkboxes **/
         let make_vs_buttons = function (cell, formatterParams, onRendered) {
@@ -198,6 +170,12 @@ class FancyDex {
             }
             return buttonrow1 + "<br\>" + buttonrow2;
         }
+
+        /** Let name link to the individual view **/
+        let name_formatter = function(cell, formatterParams, onRendered){
+            cell.getElement().addEventListener("click", ev => that.card_manager.update_objects("iv", 0, cell.getData().long_id));
+            return cell.getValue();
+        };
 
         /** Fancy way to update who is in VS **/
         let check_callback_vs = function(e, cell) {
@@ -284,7 +262,7 @@ class FancyDex {
                 ,
                 {title:"#", field:"long_id", sorter:"number", headerFilter:"input",headerFilterPlaceholder:"Search", width:20}
                 ,
-                {title:"Name", field:"name", headerFilter:"input",headerFilterPlaceholder:"Search", width:100}
+                {title:"Name", field:"name", headerFilter:"input",headerFilterPlaceholder:"Search", width:100, formatter:name_formatter}
                 ,
                 {title:"Base Stats", field:"perc_stat_total", width:75, headerFilter:"number", headerFilterPlaceholder:"at least", headerFilterFunc:(h,r)=>(+h)*100/this.max_stat_total<=r, formatter:"progress", formatterParams:{color:"#b1b1b1", legend:(x)=>"&nbsp;&nbsp;"+(x*this.max_stat_total/100).toFixed(0), legendAlign:'left'}}
                 ,
