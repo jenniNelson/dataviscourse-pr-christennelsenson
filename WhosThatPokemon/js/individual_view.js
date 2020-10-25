@@ -61,6 +61,7 @@ class IndividualView {
         console.log(this.current_mon);
         let curr_mon = this.mons[this.current_mon];
         let dest_mon_id = curr_mon.getEvosTo()[idx];
+        if(!dest_mon_id) return;
         let dest_mon = this.mons[dest_mon_id];
         if(curr_mon.is_randomized && !curr_mon.revealed_ev_to_idxs.includes(idx)) {
             curr_mon.revealed_ev_to_idxs.push(idx);
@@ -68,11 +69,10 @@ class IndividualView {
             dest_mon.revealed_ev_from_idxs.push(idx_of_mon_in_dest_list);
 
             //Jury's out on this line
-            dest_mon.is_stats_revealed = true;
-            this.card_manager.update_objects("iv", 0, dest_mon.long_id);
+            // dest_mon.is_stats_revealed = true;
         }
 
-        this.update(dest_mon.long_id);
+        this.card_manager.update_objects("iv", 0, dest_mon.long_id);
 
     }
 
@@ -82,8 +82,8 @@ class IndividualView {
         console.log(this.mons[this.current_mon].getRevealedEvosFrom());
         console.log(dest_id);
         let dest_mon = this.mons[this.mons[this.current_mon].getRevealedEvosFrom()[idx]];
+        this.card_manager.update_objects("iv", 0, dest_mon.long_id);
 
-        this.update(dest_mon.long_id)
     }
 
     drawPanel() {
@@ -99,12 +99,12 @@ class IndividualView {
             .attr("x", 10)
             .attr("y", 10)
             .attr("width", 880)
-            .attr("height", 980)
+            .attr("height", 840)
             .attr("rx", 10)
             .attr("fill", this.type_colors[mon.getType()[0]][0]);
 
         let image_group = main_group.append("g")
-            .attr("transform", "translate(100, 100), scale(2, 2)");
+            .attr("transform", "translate(100, 50), scale(2, 2)");
 
         image_group.append("circle")
             .attr("cx", 60)
@@ -122,12 +122,12 @@ class IndividualView {
         //Image
 
         let chart_group = main_group.append("g")
-            .attr("transform", "translate(200, 100)");
+            .attr("transform", "translate(370, 80) scale(1.3,1.3)");
 
         chart_group.append("rect")
-            .attr("x", 0)
+            .attr("x", -5)
             .attr("y", 0)
-            .attr("width", 295)
+            .attr("width", 300)
             .attr("height", 130)
             .attr('rx', 10)
             .attr("fill", "#fff8d6")
@@ -171,7 +171,7 @@ class IndividualView {
         //TODO: Get a chart. Horizontal.
 
         let info_group = main_group.append("g")
-            .attr("transform", "translate(300, 100)");
+            .attr("transform", "translate(300, 300)");
 
         info_group.append("text")
             .attr("x", 0)
@@ -228,12 +228,13 @@ class IndividualView {
         //TODO: Types, Abilities (only first 2), Height, Weight
 
         let ev_to_group = main_group.append("g")
-            .attr("transform", "translate(400, 100)");
+            .attr("transform", "translate(800, 100)");
         let cradius = 20;
         let c_v_offset = 50;
         //This is where the fun begins
         let vanilla_evos = mon.ev_to.map(id => that.mons[id]);
-        ev_to_group.selectAll("circle").data(vanilla_evos)
+        console.log(mon.getEvosTo().length);
+        ev_to_group.selectAll("circle").data(vanilla_evos.slice(0, mon.getEvosTo().length))
             .join("circle")
             .attr("r", cradius)
             .attr("cy", (d, i) => cradius + i*c_v_offset)
@@ -275,7 +276,7 @@ class IndividualView {
         //TODO: typed circle, tooltip with vanilla evolution name unless it's revealed.
 
         let ev_from_group = main_group.append("g")
-            .attr("transform", "translate(500, 100)");
+            .attr("transform", "translate(50, 100)");
         ev_from_group.selectAll("circle").data(mon.getRevealedEvosFrom())
             .join("circle")
             .attr("cx", cradius)
@@ -295,7 +296,203 @@ class IndividualView {
                     .on("click", () => that.follow_evolution_from(i))
             });
 
-        let rev_buttons_group = main_group.append("g")
-            .attr("transform", "translate(400, 400)");
+
+
+        if(mon.is_randomized) {
+            let rev_buttons_group = main_group.append("g")
+            .attr("transform", "translate(400, 270)");
+
+            rev_buttons_group.append("circle")
+                .attr("cx", 10)
+                .attr("cy", 10)
+                .attr("r", 10)
+                .attr("stroke", this.type_colors[mon.getType()[0]][1])
+                .attr("fill", "none")
+                .on("click", () => console.log("clicked"));//this.card_manager.update_pokemon(vs_or_tb, +card_id, prev_ev));
+
+
+            rev_buttons_group.append("circle")
+                .attr("cx", 10)
+                .attr("cy", 10)
+                .attr("r", 7)
+                .attr("fill", (mon.is_encountered || mon.is_stats_revealed)?this.type_colors[mon.getType()[0]][1]:this.type_colors[mon.getType()[0]][0])
+                .on("click", function() {
+                    if(mon.is_stats_revealed){
+                        mon.is_stats_revealed = false;
+                        mon.is_encountered = false;
+                    } else{
+                        mon.is_encountered = !mon.is_encountered;
+                    }
+                    console.log(mon);
+                    that.card_manager.update_objects('iv', 0, mon.long_id);
+                });
+
+
+            rev_buttons_group.append("text")
+                .attr("x", 24)
+                .attr("y", 15)
+                .style("font-size", "10pt")
+                .text("Encountered");
+
+            rev_buttons_group.append("circle")
+                .attr("cx", 150)
+                .attr("cy", 10)
+                .attr("r", 10)
+                .attr("stroke", this.type_colors[mon.getType()[0]][1])
+                .attr("fill", "none");
+
+
+            rev_buttons_group.append("circle")
+                .attr("cx", 150)
+                .attr("cy", 10)
+                .attr("r", 7)
+                .attr("fill", mon.is_stats_revealed ? this.type_colors[mon.getType()[0]][1]: this.type_colors[mon.getType()[0]][0])
+                .on("click", function() {
+                    if (mon.is_stats_revealed){
+                        mon.is_stats_revealed = false;
+                    }else {
+                        mon.is_stats_revealed = true;
+                        mon.is_encountered = true;
+                    }
+                    that.card_manager.update_objects('iv', 0, mon.long_id)
+                });
+
+
+            rev_buttons_group.append("text")
+                .attr("x", 164)
+                .attr("y", 15)
+                .style("font-size", "10pt")
+                .text("Caught");
+        }
+
+        let weaknesses = getWeaknesses(mon);
+        let resistances = getResistances(mon);
+        let vert_buffer = 30;
+        let horiz_buffer = 90;
+        let cols = 5;
+        let weak_rows = Math.max(1, Math.ceil(weaknesses.length / cols));
+        let res_rows = Math.max(1, Math.ceil(resistances.length / cols));
+        let min_zone_height = 15;
+        let zone_buffer = 40;
+
+        let type_effectiveness = main_group.append("g")
+            .attr("transform", "translate(" + (880/2 - (20 + cols * horiz_buffer)/2) + ", 600)");
+
+        if (!mon.is_randomized || mon.is_encountered) {
+            type_effectiveness.append("rect")
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", 20 + cols * horiz_buffer)
+                .attr("height", min_zone_height + weak_rows * vert_buffer)
+                .attr("fill", this.type_colors[mon.getType()[0]][1])
+                .attr("rx", 10);
+
+            let weak_group = type_effectiveness.append("g")
+                .attr("transform", "translate(10, 10)");
+
+            weak_group.append("text")
+                .attr("x", 10)
+                .attr("y", -15)
+                .style("font-weight", "800")
+                .style("text-decoration", "underline")
+                .style("font-size", "20px")
+                .text("WEAKNESSES    ");
+
+            let weak_image_groups = weak_group.selectAll("g").data(weaknesses).join("g");
+            weak_image_groups.append("image")
+                .attr("x", (d, i) => (i%5) * horiz_buffer)
+                .attr("y", (d, i) => Math.floor(i/5) * vert_buffer)
+                .attr("height", 20)
+                .attr("width", 80)
+                .attr("href", d => "data/pokemon_data/typelabels/" + d.type + ".gif");
+            weak_image_groups.append("text")
+                .attr("x", (d, i) => (i%5) * horiz_buffer + 63)
+                .attr("y", (d, i) => Math.floor(i/5) * vert_buffer + 20)
+                .attr("style", "font: bold; paint-order: stroke; fill: white; font-size: 8pt; stroke-width:3px; stroke: black")
+                .text(d => multiplierString(d.multiplier));
+
+            type_effectiveness.append("rect")
+                .attr("x", 0)
+                .attr("y", min_zone_height + zone_buffer + weak_rows * vert_buffer)
+                .attr("width", 20 + cols * horiz_buffer)
+                .attr("height", 20 + res_rows * vert_buffer)
+                .attr("fill", this.type_colors[mon.getType()[0]][1])
+                .attr("rx", 10);
+
+            let res_group = type_effectiveness.append("g")
+                .attr("transform", "translate(10, " + (min_zone_height + zone_buffer + 10 + weak_rows * vert_buffer) +")");
+
+            res_group.append("text")
+                .attr("x", 10)
+                .attr("y", -15)
+                .style("font-weight", "800")
+                .style("text-decoration", "underline")
+                .style("font-size", "20px")
+                .text("RESISTANCES");
+
+            let res_image_groups = res_group.selectAll("g").data(resistances).join("g");
+            res_image_groups.append("image")
+                .attr("x", (d, i) => (i%5) * horiz_buffer)
+                .attr("y", (d, i) => Math.floor(i/5) * vert_buffer)
+                .attr("height", 20)
+                .attr("width", 80)
+                .attr("href", d => "data/pokemon_data/typelabels/" + d.type + ".gif");
+            res_image_groups.append("text")
+                .attr("x", (d, i) => (i%5) * horiz_buffer + 63)
+                .attr("y", (d, i) => Math.floor(i/5) * vert_buffer + 20)
+                .attr("style", "font: bold; paint-order: stroke; fill: white; font-size: 8pt; stroke-width: 3px; stroke: black")
+                .text(d => multiplierString(d.multiplier));
+        }
+
     }
+}
+
+
+function get_eff_multiplier(mon, type) {
+    if( mon.getType()[0] === '' || mon.getType()[0] === 'missing'){
+        return false;
+    }
+    let idx1 = types_to_idx[mon.getType()[0]];
+    let atkidx = types_to_idx[type];
+    if(mon.getType()[1] !== '' && mon.getType()[1] !== mon.getType()[0]) {
+        let idx2 = types_to_idx[mon.getType()[1]];
+        return matchups[atkidx][idx1] * matchups[atkidx][idx2];
+    } else {
+        return matchups[atkidx][idx1];
+    }
+}
+
+function getWeaknesses(mon) {
+    let res = [];
+    for(let type of idx_to_types) {
+        let multiplier = get_eff_multiplier(mon, type);
+        if(multiplier > 1)
+            res.push({type: type, multiplier: multiplier})
+    }
+    return res;
+}
+
+function getResistances(mon) {
+    let res = [];
+    for(let type of idx_to_types) {
+        let multiplier = get_eff_multiplier(mon, type);
+        if(multiplier < 1)
+            res.push({type: type, multiplier: multiplier})
+    }
+    return res;
+}
+
+function multiplierString(mult) {
+    if(mult === 4)
+        return "x4";
+    else if(mult === 2)
+        return "x2";
+    else if(mult === .5)
+        return "x1/2";
+    else if(mult === .25)
+        return "x1/4";
+    else if(mult === 0)
+        return "x0";
+    else
+        return "x1";
 }

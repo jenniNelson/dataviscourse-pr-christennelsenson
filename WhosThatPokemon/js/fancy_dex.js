@@ -124,6 +124,8 @@ class FancyDex {
     }
 
     update_post_randomize(){
+        d3.select("#map_area").classed("hidden", true);
+        d3.select("#fancydex").style("height", "1000px")
         this.rando_mode = true;
         this.set_pokemon_data();
         this.fancydex.setData(this.pokemon);

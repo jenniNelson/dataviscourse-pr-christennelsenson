@@ -353,10 +353,12 @@ class Pokemon{
 
     reveal_evolutions() {
         for(let i = 0; i < this.rand_ev_to.length; i++) {
-            this.revealed_ev_to_idxs.push(i);
+            if(!this.revealed_ev_to_idxs.includes(i))
+                this.revealed_ev_to_idxs.push(i);
         }
         for(let i = 0; i < this.rand_ev_froms.length; i++) {
-            this.revealed_ev_from_idxs.push(i);
+            if(!this.revealed_ev_from_idxs.includes(i))
+                this.revealed_ev_from_idxs.push(i);
         }
     }
 

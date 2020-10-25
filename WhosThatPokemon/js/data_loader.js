@@ -42,6 +42,10 @@ class DataLoader {
             this.spoil_me_button.value = "Un-Spoil Me";
             this.spoil_toggle = !this.spoil_toggle;
 
+            let sorted = Object.values(this.poke_dict).sort( (a, b) => b.rand_ev_froms.length - a.rand_ev_froms.length);
+            console.log(sorted[0])
+
+
         } else {
             for(let mon_id in this.poke_dict){
                 this.poke_dict[mon_id].is_encountered = false;
