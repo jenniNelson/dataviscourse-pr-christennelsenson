@@ -24,7 +24,7 @@ class Matchups{
         this.mons = Object.values(pokemon).sort((a,b)=>+a.long_id - +b.long_id);
         this.mons.push(missingno);
 
-        this.current_view = "team";
+        this.current_view = "iv";
 
         this.num_vs = 2;
         this.num_team = 6;
@@ -82,7 +82,7 @@ class Matchups{
         let that = this;
         d3.selectAll("#view_switcher .tablinks").data(["vs", "team", "iv"])
             .on("click", d=>that.switch_tabs(d));
-        d3.select("#team_builder_button")
+        d3.select("#individual_view_button")
             .classed("active", true);
     }
 
@@ -186,13 +186,13 @@ class Matchups{
         for (let j = 0; j<this.num_vs; j++) {
             let mon = this.poke_dict[this.card_manager.vs[j]];
             this.draw_card(this.card_manager.vs[j], "#vs_svg_" + j);
-            $("#vs_dd_"+j).val(mon.long_id)
+            $("#vs_dd_"+j).val(mon?mon.long_id:"whodat")
                 .trigger("change");
         }
         for (let j = 0; j<this.num_team; j++) {
             let mon = this.poke_dict[this.card_manager.team[j]];
             this.draw_card(this.card_manager.team[j], "#tb_svg_" + j);
-            $("#tb_dd_"+j).val(mon.long_id)
+            $("#tb_dd_"+j).val(mon?mon.long_id:"whodat")
                 .trigger("change");
         }
     }
@@ -344,6 +344,9 @@ class Matchups{
         let next_evs = mon.ev_to;
 
         let [vs_or_tb, _, card_id] = svg_id.split('_');
+
+        let cradius = 20;
+        let cspace = 45;
 
         if (prev_ev) {
             let prev_group = pallet.append("g")
@@ -511,7 +514,7 @@ class Matchups{
     update_summary(category) {
         if (category === "vs") {
             this.draw_vs_summary();
-        } else if (category === "tb") {
+        } else if (category === "team") {
             this.draw_team_summary();
         } else if (category === "iv") {
             // this.individual_view.update(this.individual_view.current_mon)
@@ -1139,6 +1142,19 @@ let missingno = {
                 },
                 getAbilities() {
                     return ["???",""];
+                },
+                getEvosTo() {
+                    return []
+                },
+                getEvosFrom() {
+                    return [];
+                },
+                getRevealedEvosFrom() {
+                    return [];
+                },
+                getRevealedEvosTo() {
+                    return [];
                 }
+
 
 };

@@ -6,24 +6,24 @@ class IndividualView {
         this.mons = mons_dict;
 
         this.type_colors = {
-            "fire" : ["#ff4f4a","#9b1414"],
+            "fire" : ["#ff6966","#9b1414"],
             "water" : ["#6765ff","#3b3e9b"],
-            "grass" : ["#3cd41d","#359b21"],
-            "bug" : ["#23ff10","#4fb525"],
+            "grass" : ["#84d472","#359b21"],
+            "bug" : ["#83ff78","#4fb525"],
             "ground" : ["#ffae35","#9b772f"],
             "rock" : ["#ff6f40","#9b6145"],
             "steel" : ["#c0b4b6","#726a6a"],
-            "fairy" : ["#ff6090","#9b1e44"],
+            "fairy" : ["#ffadc7","#9b1e44"],
             "dark" : ["#686766","#3e3b39"],
-            "psychic" : ["#ff89c7","#9b4e90"],
+            "psychic" : ["#ffbde0","#9b4e90"],
             "ghost" : ["#e486ff","#8d689b"],
             "poison" : ["#bf68bb","#755671"],
             "dragon" : ["#9782ff","#71669b"],
-            "ice" : ["#88fff2","#647c9b"],
+            "ice" : ["#bafff6","#647c9b"],
             "flying" : ["#aaa5ff","#668d9b"],
             "normal" : ["#f2ffb8","#9b996d"],
             "fighting" : ["#ff9a78","#9b532f"],
-            "electric" : ["#ffff56","#c8c24a"],
+            "electric" : ["#ffffa3","#c8c24a"],
             "missing" : ["#505050", "#0c0c0c"]
         };
 
@@ -46,7 +46,7 @@ class IndividualView {
             .append("svg")
             .attr("id", "iv_svg")
             .attr("width", 900)
-            .attr("height", 1000);
+            .attr("height", 810);
     }
 
     update(mon_id) {
@@ -93,13 +93,15 @@ class IndividualView {
         let main_group = this.pallet.append("g");
 
         let mon = this.mons[this.current_mon];
+        if(!mon)
+            mon = missingno;
 
         main_group
             .append("rect")
             .attr("x", 10)
             .attr("y", 10)
             .attr("width", 880)
-            .attr("height", 840)
+            .attr("height", 790)
             .attr("rx", 10)
             .attr("fill", this.type_colors[mon.getType()[0]][0]);
 
@@ -171,59 +173,86 @@ class IndividualView {
         //TODO: Get a chart. Horizontal.
 
         let info_group = main_group.append("g")
-            .attr("transform", "translate(300, 300)");
+            .attr("transform", "translate(" + (180  - (mon.getType()[1] ?  30: 0)) + ", 300)");
 
-        info_group.append("text")
+        if(mon.getType()[0] !== "missing") {
+            info_group.append("rect")
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", 80 + (mon.getType()[1] ?  60: 0))
+                .attr("height", 30)
+                .attr("fill", this.type_colors[mon.getType()[0]][1])
+                .attr("rx", 10);
+        }
+
+        let type_group = info_group.append("g")
             .attr("x", 0)
+            .attr("y", 0);
+
+        type_group.selectAll("image").data(mon.getType().filter(x => x && x !== "missing"))
+            .join("image")
+            .attr("x", (d,i) => 15 + i*60 )
+            .attr("y", 5)
+            .attr("width", 50)
+            .attr("height", 20)
+            .attr("href", d => "data/pokemon_data/typelabels/" + d + ".gif");
+
+        info_group.append("rect")
+            .attr("x", 200)
             .attr("y", 0)
-            .text("Type:");
-        info_group.append("text")
-            .attr("x", 0)
-            .attr("y", 13)
-            .text(((mon.getType()[1] !== '') && (mon.getType()[0] !== mon.getType()[1]) ?mon.getType()[0] +' & '+ mon.getType()[1] :mon.getType()[0]))
-            .style("font-size", "11pt");
-
-
-        info_group.append("text")
-            .attr("x", 0)
-            .attr("y", 40)
-            .text("height:")
-            .style("font-size", "10pt");
+            .attr("width", 320)
+            .attr("height", 200)
+            .attr("stroke", this.type_colors[mon.getType()[0]][1])
+            .style("stroke-width", "4px")
+            .attr("fill", "none")
+            .attr("rx", 10);
 
         info_group.append("text")
-            .attr("x", 10)
-            .attr("y", 54)
+            .attr("x", 212)
+            .attr("y", 100)
+            .style("font-weight", "800")
+            .style("text-decoration", "underline")
+            .style("font-size", "18px")
+            .text("Height:");
+
+        info_group.append("text")
+            .attr("x", 220)
+            .attr("y", 126)
             .text((mon.height_m ? mon.height_m : "???") + " m")
-            .style("font-size", "10pt");
+            .style("font-size", "13pt");
 
         info_group.append("text")
-            .attr("x", 0)
-            .attr("y", 72)
-            .text("weight:")
-            .style("font-size", "10pt");
+            .attr("x", 212)
+            .attr("y", 150)
+            .style("font-weight", "800")
+            .style("text-decoration", "underline")
+            .style("font-size", "18px")
+            .text("Weight:");
 
         info_group.append("text")
-            .attr("x", 10)
-            .attr("y", 86)
+            .attr("x", 220)
+            .attr("y", 176)
             .text((mon.weight_kg ? mon.weight_kg : "???") + " kg")
-            .style("font-size", "10pt");
+            .style("font-size", "13pt");
 
         info_group.append("text")
-            .attr("x", 0)
-            .attr("y", 104)
-            .text("abilities:")
-            .style("font-size", "10pt");
+            .attr("x", 212)
+            .attr("y", 22)
+            .style("font-weight", "800")
+            .style("text-decoration", "underline")
+            .style("font-size", "18px")
+            .text("Abilities:");
 
         info_group.append("text")
-            .attr("x", 10)
-            .attr("y", 118)
+            .attr("x", 220)
+            .attr("y", 50)
             .text(mon.getAbilities()[0])
-            .style("font-size", "10pt");
+            .style("font-size", "13pt");
         info_group.append("text")
-            .attr("x", 10)
-            .attr("y", 130)
+            .attr("x", 220)
+            .attr("y", 70)
             .text(mon.getAbilities()[1])
-            .style("font-size", "10pt");
+            .style("font-size", "13pt");
 
         //TODO: Types, Abilities (only first 2), Height, Weight
 
@@ -376,9 +405,9 @@ class IndividualView {
         let zone_buffer = 40;
 
         let type_effectiveness = main_group.append("g")
-            .attr("transform", "translate(" + (880/2 - (20 + cols * horiz_buffer)/2) + ", 600)");
+            .attr("transform", "translate(" + (880/2 - (20 + cols * horiz_buffer)/2) + ", 550)");
 
-        if (!mon.is_randomized || mon.is_encountered) {
+        if (!mon.is_randomized || mon.is_encountered || mon.is_stats_revealed) {
             type_effectiveness.append("rect")
                 .attr("x", 0)
                 .attr("y", 0)
@@ -463,6 +492,8 @@ function get_eff_multiplier(mon, type) {
 }
 
 function getWeaknesses(mon) {
+    if(mon.long_id === "whodat")
+        return [];
     let res = [];
     for(let type of idx_to_types) {
         let multiplier = get_eff_multiplier(mon, type);
@@ -473,6 +504,8 @@ function getWeaknesses(mon) {
 }
 
 function getResistances(mon) {
+    if(mon.long_id === "whodat")
+        return [];
     let res = [];
     for(let type of idx_to_types) {
         let multiplier = get_eff_multiplier(mon, type);
